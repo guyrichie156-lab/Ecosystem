@@ -13,5 +13,6 @@ config.resolver.nodeModulesPaths = [
 ];
 config.resolver.disableHierarchicalLookup = true;
 config.resolver.unstable_enableSymlinks = true;
+config.resolver.sourceExts.push("sql");
 
 module.exports = config;
