@@ -1,0 +1,1 @@
+ALTER TABLE `accounts` ADD `low_balance_threshold` integer;

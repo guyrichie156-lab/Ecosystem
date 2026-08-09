@@ -1,0 +1,21 @@
+node_modules/
+.pnpm-store/
+
+# Expo / React Native
+.expo/
+apps/*/android/
+apps/*/ios/
+apps/*/.expo/
+
+# Build artifacts
+dist/
+*.apk
+*.aab
+
+# Local env
+.env
+.env.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
