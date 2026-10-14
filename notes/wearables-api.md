@@ -16,6 +16,8 @@
 Библиотека: https://github.com/matinzd/react-native-health-connect (Expo, development build).
 Не проверено: какие приложения колец пишут данные в Health Connect.
 
+Health Connect есть только на Android. На iPhone аналог — Apple HealthKit, библиотека с плагином для Expo: https://classic.yarnpkg.com/en/package/@kingstinct/react-native-healthkit (в Expo Go не работает, нужен development build).
+
 ## Окружающая среда
 Датчиков окружающей среды у этих колец и браслетов не найдено (температура кожи — это тело).
 Внешние данные: Open-Meteo Air Quality API — без ключа: PM2.5, PM10, UV-индекс, пыльца (только Европа).

@@ -1,5 +1,10 @@
 # Журнал решений
 
+## 2026-10-14 (iPhone)
+- iOS-версия на iPhone не проверялась. Код и app.json рассчитаны на iOS (bundleIdentifier, плагин expo-widgets), но кода iOS-виджета нет.
+- Сборка для iPhone: на Mac (`pnpm ios`) или в облаке EAS Build без Mac; для установки на телефон нужен аккаунт Apple Developer: https://docs.expo.dev/build/internal-distribution/
+- Данные о здоровье на iPhone — через HealthKit, а не Health Connect.
+
 ## 2026-10-14
 - Приложение можно запускать в браузере на localhost (`cd apps/mobile && pnpm web`). Добавлены react-native-web, react-dom, @expo/metro-runtime.
 - Для SQLite в браузере: заголовки COOP/COEP и поддержка wasm в `apps/mobile/metro.config.js` (по официальной инструкции Expo для expo-sqlite).
