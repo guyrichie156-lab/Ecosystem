@@ -5,6 +5,7 @@
   "dependencies": {
     "@ecosystem/db": "workspace:*",
     "@ecosystem/finance": "workspace:*",
+    "@expo/metro-runtime": "~57.0.8",
     "drizzle-orm": "^0.45.2",
     "expo": "~57.0.11",
     "expo-dev-client": "~57.0.10",
@@ -16,10 +17,12 @@
     "expo-status-bar": "~57.0.1",
     "expo-widgets": "~57.0.8",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.86.2",
     "react-native-android-widget": "^0.21.0",
     "react-native-safe-area-context": "~5.7.0",
-    "react-native-screens": "~4.26.2"
+    "react-native-screens": "~4.26.2",
+    "react-native-web": "~0.21.4"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",

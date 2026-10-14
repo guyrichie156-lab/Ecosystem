@@ -19,3 +19,6 @@ dist/
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Obsidian vault settings (notes/)
+notes/.obsidian/

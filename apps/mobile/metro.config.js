@@ -15,4 +15,14 @@ config.resolver.disableHierarchicalLookup = true;
 config.resolver.unstable_enableSymlinks = true;
 config.resolver.sourceExts.push("sql");
 
+// Web: expo-sqlite needs wasm assets and SharedArrayBuffer (COEP/COOP headers)
+config.resolver.assetExts.push("wasm");
+config.server.enhanceMiddleware = (middleware) => {
+  return (req, res, next) => {
+    res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+    middleware(req, res, next);
+  };
+};
+
 module.exports = config;

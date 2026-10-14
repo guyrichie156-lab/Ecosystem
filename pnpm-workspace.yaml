@@ -1,6 +1,11 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - apps/*
+  - packages/*
+
 allowBuilds:
   esbuild: true
+
 nodeLinker: hoisted
+
+patchedDependencies:
+  expo-sqlite@57.0.1: patches/expo-sqlite@57.0.1.patch
