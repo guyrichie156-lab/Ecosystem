@@ -4,6 +4,8 @@
 - iOS-версия на iPhone не проверялась. Код и app.json рассчитаны на iOS (bundleIdentifier, плагин expo-widgets), но кода iOS-виджета нет.
 - Сборка для iPhone: на Mac (`pnpm ios`) или в облаке EAS Build без Mac; для установки на телефон нужен аккаунт Apple Developer: https://docs.expo.dev/build/internal-distribution/
 - Данные о здоровье на iPhone — через HealthKit, а не Health Connect.
+- Быстрый способ посмотреть на iPhone без Mac и без аккаунта Apple: Expo Go (App Store), команда `npx expo start --go`. iOS-бандл собирается без ошибок; react-native-android-widget на iOS подставляет пустой модуль (проверено в исходниках). На реальном iPhone ещё не запускалось.
+- С сентября 2026 Expo Go на iPhone требует вход в аккаунт Expo и в терминале (`npx expo login`), и в приложении: https://docs.expo.dev/troubleshooting/expo-go-sign-in-required/
 
 ## 2026-10-14
 - Приложение можно запускать в браузере на localhost (`cd apps/mobile && pnpm web`). Добавлены react-native-web, react-dom, @expo/metro-runtime.

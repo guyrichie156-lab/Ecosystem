@@ -27,6 +27,16 @@ pnpm android
 
 Виджет «Баланс» и уведомления работают только в Android-версии.
 
+На iPhone через Expo Go (компьютер и iPhone в одной Wi-Fi сети):
+
+```bash
+npx expo login          # бесплатный аккаунт Expo, тот же вход нужен в Expo Go
+cd apps/mobile
+npx expo start --go
+```
+
+Отсканируйте QR-код камерой iPhone.
+
 ## Структура
 
 - `apps/mobile` — приложение (Expo SDK 57, expo-router)
