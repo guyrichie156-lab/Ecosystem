@@ -1,5 +1,6 @@
 import type { AppModule } from "@ecosystem/core";
 import { financeModule } from "@ecosystem/finance";
+import { healthModule } from "@ecosystem/health";
 
 /**
  * Every feature module of the app, in tab order.
@@ -7,4 +8,4 @@ import { financeModule } from "@ecosystem/finance";
  * and put its routes in `app/(tabs)/<module id>/` whose `_layout.tsx` exports
  * `ErrorBoundary` rendering `ModuleErrorFallback`.
  */
-export const appModules: AppModule[] = [financeModule];
+export const appModules: AppModule[] = [financeModule, healthModule];

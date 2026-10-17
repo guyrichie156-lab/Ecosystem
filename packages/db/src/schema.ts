@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const accounts = sqliteTable("accounts", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -49,6 +49,40 @@ export const budgets = sqliteTable("budgets", {
   // Format: "YYYY-MM"
   startMonth: text("start_month").notNull(),
 });
+
+export const BODY_MEASUREMENT_KINDS = [
+  "weight",
+  "bodyFat",
+  "neck",
+  "chest",
+  "waist",
+  "belly",
+  "hips",
+  "biceps",
+  "thigh",
+] as const;
+export type BodyMeasurementKind = (typeof BODY_MEASUREMENT_KINDS)[number];
+
+// One value per row; the rows saved together share `measured_at` and form one check-in.
+export const bodyMeasurements = sqliteTable(
+  "body_measurements",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    kind: text("kind", { enum: BODY_MEASUREMENT_KINDS }).notNull(),
+    // Integers, never floats: grams for "weight", tenths of a percent for "bodyFat",
+    // millimetres for every circumference.
+    value: integer("value").notNull(),
+    measuredAt: integer("measured_at").notNull(),
+    // Where the value came from: typed in, or imported from Health Connect.
+    source: text("source", { enum: ["manual", "health_connect"] }).notNull().default("manual"),
+    // The record's id in its source; unique so an import never adds the same record twice.
+    externalId: text("external_id"),
+  },
+  (t) => [
+    index("body_measurements_kind_measured_at").on(t.kind, t.measuredAt),
+    uniqueIndex("body_measurements_external_id").on(t.externalId),
+  ]
+);
 
 export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions, { relationName: "accountTransactions" }),

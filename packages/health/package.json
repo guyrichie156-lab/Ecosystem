@@ -1,0 +1,26 @@
+{
+  "name": "@ecosystem/health",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@ecosystem/core": "workspace:*",
+    "@ecosystem/db": "workspace:*",
+    "drizzle-orm": "*",
+    "expo-router": "*",
+    "expo-sqlite": "~57.0.1",
+    "react": "*",
+    "react-native": "*",
+    "react-native-health-connect": "4.1.3",
+    "react-native-svg": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "tsx": "*",
+    "typescript": "*"
+  },
+  "scripts": {
+    "test": "tsx --test src/lib/*.test.ts"
+  }
+}
