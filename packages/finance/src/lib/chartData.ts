@@ -6,14 +6,16 @@ export type MonthSpend = { monthStart: number; amount: number };
 
 /**
  * At most `maxSegments` slices: a donut stops working past ~6 (dataviz skill), so the
- * smallest categories fold into one "Другое" slice. Input must be sorted largest first.
+ * smallest categories fold into one "Остальные (N)" slice — not "Другое", which is a real
+ * default category. Input must be sorted largest first.
  */
 export function foldCategories(rows: CategorySpend[], maxSegments = 6): DonutSegment[] {
   const positive = rows.filter((r) => r.amount > 0);
   if (positive.length <= maxSegments) return positive.map((r) => ({ ...r, other: false }));
   const kept = positive.slice(0, maxSegments - 1).map((r) => ({ ...r, other: false }));
-  const rest = positive.slice(maxSegments - 1).reduce((sum, r) => sum + r.amount, 0);
-  return [...kept, { categoryId: null, name: "Другое", amount: rest, other: true }];
+  const tail = positive.slice(maxSegments - 1);
+  const rest = tail.reduce((sum, r) => sum + r.amount, 0);
+  return [...kept, { categoryId: null, name: `Остальные (${tail.length})`, amount: rest, other: true }];
 }
 
 /**

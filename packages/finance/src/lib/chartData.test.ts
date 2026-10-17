@@ -16,12 +16,12 @@ test("up to six categories stay as they are", () => {
   );
 });
 
-test("past six categories the smallest fold into «Другое»", () => {
+test("past six categories the smallest fold into one «Остальные» slice", () => {
   const rows = [70, 60, 50, 40, 30, 20, 10].map((a, i) => row(`К${i + 1}`, a, i + 1));
   const segments = foldCategories(rows);
   assert.equal(segments.length, 6);
   assert.deepEqual(segments.slice(0, 5).map((s) => s.name), ["К1", "К2", "К3", "К4", "К5"]);
-  assert.deepEqual([segments[5].name, segments[5].amount, segments[5].other], ["Другое", 30, true]);
+  assert.deepEqual([segments[5].name, segments[5].amount, segments[5].other], ["Остальные (2)", 30, true]);
 });
 
 test("categories with nothing spent are left out", () => {
