@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Platform, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
 import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
+import { niceTicks } from "../lib/ticks";
 
 // Single-series line chart. Colors: series = categorical slot 1 of the dataviz
 // reference palette (validated on the white surface), text and grid in neutral tokens.
@@ -17,24 +18,6 @@ const PAD = { top: 12, right: 16, bottom: 24, left: 44 };
 
 export type ChartPoint = { x: number; y: number };
 
-/** Round tick values (1, 2 or 5 times a power of ten) covering [min, max]. */
-function niceTicks(min: number, max: number, count = 4): number[] {
-  if (min === max) {
-    min -= 1;
-    max += 1;
-  }
-  const rough = (max - min) / count;
-  const power = 10 ** Math.floor(Math.log10(rough));
-  const n = rough / power;
-  const step = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * power;
-  const ticks: number[] = [];
-  for (let v = Math.floor(min / step) * step; v <= max + step / 2; v += step) {
-    ticks.push(Math.round(v * 1000) / 1000);
-    if (v >= max) break;
-  }
-  return ticks;
-}
-
 const shortDate = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
 
 export function LineChart({
@@ -42,6 +25,7 @@ export function LineChart({
   selectedIndex,
   onSelect,
   formatTick,
+  minTickStep = 0,
   accessibilityLabel,
 }: {
   /** Oldest first; `x` is a timestamp, `y` a value in displayed units. */
@@ -49,13 +33,15 @@ export function LineChart({
   selectedIndex: number;
   onSelect: (index: number) => void;
   formatTick: (value: number) => string;
+  /** Smallest step between ticks, in displayed units. */
+  minTickStep?: number;
   accessibilityLabel: string;
 }) {
   const [width, setWidth] = useState(0);
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
 
   const ys = points.map((p) => p.y);
-  const ticks = niceTicks(Math.min(...ys), Math.max(...ys));
+  const ticks = niceTicks(Math.min(...ys), Math.max(...ys), minTickStep);
   const yMin = ticks[0];
   const yMax = ticks[ticks.length - 1];
   const xMin = points[0].x;
