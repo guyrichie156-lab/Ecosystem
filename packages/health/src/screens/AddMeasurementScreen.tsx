@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { TextField } from "@ecosystem/core";
 import { useRouter } from "expo-router";
-import { BODY_MEASUREMENT_KINDS, KIND_INFO, parseMeasurement, type BodyMeasurementKind } from "../lib/kinds";
+import { ACTIVE_KINDS, KIND_INFO, labelWithUnit, parseMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { addCheckIn } from "../lib/measurements";
 
 export function AddMeasurementScreen() {
@@ -13,7 +14,7 @@ export function AddMeasurementScreen() {
   async function handleSave() {
     const values: Partial<Record<BodyMeasurementKind, number>> = {};
     const problems: string[] = [];
-    for (const kind of BODY_MEASUREMENT_KINDS) {
+    for (const kind of ACTIVE_KINDS) {
       const text = inputs[kind]?.trim();
       if (!text) continue;
       const result = parseMeasurement(kind, text);
@@ -38,16 +39,15 @@ export function AddMeasurementScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <Text style={styles.hint}>Заполните только то, что измерили. Дробная часть — через запятую.</Text>
-      {BODY_MEASUREMENT_KINDS.map((kind) => (
-        <View key={kind} style={styles.row}>
-          <Text style={styles.label}>{KIND_INFO[kind].label}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={KIND_INFO[kind].unit}
+      {ACTIVE_KINDS.map((kind) => (
+        <View key={kind} style={styles.field}>
+          <Text style={styles.label}>{labelWithUnit(kind)}</Text>
+          <TextField
+            placeholder={KIND_INFO[kind].example}
             keyboardType="decimal-pad"
             value={inputs[kind] ?? ""}
             onChangeText={(text) => setInputs((prev) => ({ ...prev, [kind]: text }))}
-            accessibilityLabel={`${KIND_INFO[kind].label}, ${KIND_INFO[kind].unit}`}
+            accessibilityLabel={labelWithUnit(kind)}
           />
         </View>
       ))}
@@ -67,19 +67,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#ffffff" },
   content: { padding: 20, paddingBottom: 40 },
   hint: { fontSize: 14, color: "#8a8a8e", marginBottom: 12 },
-  row: { flexDirection: "row", alignItems: "center", marginTop: 10 },
-  label: { flex: 1, fontSize: 16, color: "#1c1c1e" },
-  input: {
-    width: 120,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d1d1d6",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: "#1c1c1e",
-    textAlign: "right",
-  },
+  field: { marginTop: 14 },
+  label: { fontSize: 15, fontWeight: "600", color: "#1c1c1e", marginBottom: 6 },
   error: { color: "#c62828", fontSize: 14, marginTop: 12 },
   saveButton: {
     backgroundColor: "#1c1c1e",

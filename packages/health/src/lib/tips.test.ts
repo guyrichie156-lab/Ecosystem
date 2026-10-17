@@ -83,18 +83,24 @@ test("weight loss faster than 1 kg a week is flagged, 0.5–1 kg is not", () => 
   assert.equal(getHealthTips(input({ weightSeries: slow })).find((t) => t.id === "weight-rate"), undefined);
 });
 
-test("growing waist or belly brings the abdominal-exercise study tip", () => {
-  assert.ok(ids(input({ latest: [m("belly", 950, 940, 2)] })).includes("spot-reduction"));
-  assert.ok(!ids(input({ latest: [m("belly", 930, 940, 2)] })).includes("spot-reduction"));
+test("growing waist brings the abdominal-exercise study tip", () => {
+  assert.ok(ids(input({ latest: [m("waist", 950, 940, 2)] })).includes("spot-reduction"));
+  assert.ok(!ids(input({ latest: [m("waist", 930, 940, 2)] })).includes("spot-reduction"));
 });
 
-test("biceps that stopped growing brings the WHO strength tip", () => {
-  assert.ok(ids(input({ latest: [m("biceps", 360, 360, 2)] })).includes("strength"));
-  assert.ok(!ids(input({ latest: [m("biceps", 365, 360, 2)] })).includes("strength"));
+test("zones dropped from the MVP don't trigger tips even if old rows exist", () => {
+  const old = [m("belly", 950, 940, 2), m("biceps", 360, 360, 2), m("thigh", 580, 580, 2), m("neck", 380, 370, 2)];
+  assert.deepEqual(ids(input({ latest: old })), ["activity"]);
 });
 
-test("the how-to-measure tip shows until waist or belly has 3 measurements", () => {
-  assert.ok(ids(input({ latest: [m("waist", 900, 905, 2), m("belly", 950, 955, 2)] })).includes("how-to-measure"));
+test("the activity tip carries both WHO recommendations: aerobic and strength", () => {
+  const activity = getHealthTips(input({})).find((t) => t.id === "activity")!;
+  assert.match(activity.text, /150–300 минут/);
+  assert.match(activity.text, /силовые упражнения/);
+});
+
+test("the how-to-measure tip shows until waist has 3 measurements", () => {
+  assert.ok(ids(input({ latest: [m("waist", 900, 905, 2)] })).includes("how-to-measure"));
   assert.ok(!ids(input({ latest: [m("waist", 900, 905, 3)] })).includes("how-to-measure"));
   assert.ok(!ids(input({ latest: [m("weight", 80000)] })).includes("how-to-measure"));
 });

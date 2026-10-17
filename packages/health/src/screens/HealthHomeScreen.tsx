@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useAsyncData, useRefreshOnFocus } from "@ecosystem/core";
-import { BODY_MEASUREMENT_KINDS, KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
+import { ACTIVE_KINDS, KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { getLatestMeasurements, getMeasurementSeries, type LatestMeasurement } from "../lib/measurements";
 import { getHealthProfile } from "../lib/profile";
 import { getHealthTips } from "../lib/tips";
-import { TipCard } from "../components/TipCard";
+import { TipCarousel } from "../components/TipCarousel";
 import { HealthConnectCard } from "../components/HealthConnectCard";
 import { onHealthConnectImport } from "../lib/healthConnectSync";
 
@@ -29,7 +29,7 @@ function ZoneRow({
         <Text style={latest ? styles.rowValue : styles.rowEmpty}>
           {latest ? formatMeasurement(kind, latest.value) : "—"}
         </Text>
-        {change !== null && <Text style={styles.rowChange}>{formatChange(kind, change)}</Text>}
+        {change !== null && <Text style={styles.rowChange}>{formatChange(kind, change)} с прошлого замера</Text>}
       </View>
     </Pressable>
   );
@@ -45,12 +45,11 @@ export function HealthHomeScreen() {
   useRefreshOnFocus(refresh);
   useEffect(() => onHealthConnectImport(refresh), [refresh]);
 
-  const latest = data?.latest ?? [];
+  // Old rows of zones dropped from the MVP stay in the database; the screen ignores them.
+  const latest = (data?.latest ?? []).filter((m) => (ACTIVE_KINDS as readonly BodyMeasurementKind[]).includes(m.kind));
   const byKind = new Map(latest.map((m) => [m.kind, m]));
   const lastDate = latest.length > 0 ? Math.max(...latest.map((m) => m.measuredAt)) : null;
   const tips = data?.tips ?? [];
-  const attentionTips = tips.filter((t) => t.attention);
-  const otherTips = tips.filter((t) => !t.attention);
   const openProfile = () => router.push("/health/profile");
   const profile = data?.profile;
   const profileSummary = profile
@@ -63,7 +62,7 @@ export function HealthHomeScreen() {
     <FlatList
       style={styles.container}
       contentContainerStyle={styles.content}
-      data={BODY_MEASUREMENT_KINDS}
+      data={ACTIVE_KINDS}
       keyExtractor={(kind) => kind}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
       ListHeaderComponent={
@@ -87,11 +86,7 @@ export function HealthHomeScreen() {
             </Pressable>
           </Link>
           <HealthConnectCard onImported={refresh} />
-          {/* Tips that need attention go above the zones; the rest follow them. */}
-          {attentionTips.map((tip) => (
-            <TipCard key={tip.id} tip={tip} onAction={openProfile} />
-          ))}
-          <Text style={[styles.sectionTitle, attentionTips.length > 0 && styles.zonesTitle]}>Зоны</Text>
+          <Text style={styles.sectionTitle}>Зоны</Text>
         </View>
       }
       renderItem={({ item }) => (
@@ -99,15 +94,10 @@ export function HealthHomeScreen() {
       )}
       ListFooterComponent={
         <View>
-          <Text style={styles.hint}>Справа — изменение с предыдущего замера. Нажмите на зону, чтобы увидеть график.</Text>
-          {otherTips.length > 0 && (
-            <>
-              <Text style={[styles.sectionTitle, styles.zonesTitle]}>Подсказки</Text>
-              {otherTips.map((tip) => (
-                <TipCard key={tip.id} tip={tip} onAction={openProfile} />
-              ))}
-            </>
-          )}
+          <Text style={styles.hint}>Нажмите на зону, чтобы увидеть график.</Text>
+          <View style={styles.tips}>
+            <TipCarousel tips={tips} onAction={openProfile} />
+          </View>
           {data && data.tips.length > 0 && (
             <Text style={styles.disclaimer}>
               Подсказки — справочная информация из открытых рекомендаций, не медицинская консультация.
@@ -143,8 +133,8 @@ const styles = StyleSheet.create({
   },
   profileLabel: { fontSize: 15, color: "#1c1c1e" },
   profileValue: { fontSize: 15, color: "#8a8a8e" },
-  disclaimer: { fontSize: 12, color: "#8a8a8e", marginTop: 2 },
-  zonesTitle: { marginTop: 24 },
+  disclaimer: { fontSize: 12, color: "#8a8a8e", marginTop: 10 },
+  tips: { marginTop: 24 },
   sectionTitle: { fontSize: 16, fontWeight: "600", color: "#1c1c1e", marginBottom: 8 },
   row: {
     flexDirection: "row",

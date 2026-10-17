@@ -142,7 +142,6 @@ function weightRateTip(series: TipInput["weightSeries"]): Tip | null {
 }
 
 const grew = (m: LatestMeasurement | undefined) => !!m && m.previous !== null && m.value > m.previous;
-const notGrowing = (m: LatestMeasurement | undefined) => !!m && m.previous !== null && m.value <= m.previous;
 
 export function getHealthTips({ latest, weightSeries, profile }: TipInput): Tip[] {
   const byKind = new Map(latest.map((m) => [m.kind, m]));
@@ -160,7 +159,7 @@ export function getHealthTips({ latest, weightSeries, profile }: TipInput): Tip[
   const rate = weightRateTip(weightSeries);
   if (rate) tips.push(rate);
 
-  if (grew(waist) || grew(byKind.get("belly"))) {
+  if (grew(waist)) {
     tips.push({
       id: "spot-reduction",
       attention: false,
@@ -170,18 +169,8 @@ export function getHealthTips({ latest, weightSeries, profile }: TipInput): Tip[
     });
   }
 
-  if (notGrowing(byKind.get("biceps")) || notGrowing(byKind.get("thigh"))) {
-    tips.push({
-      id: "strength",
-      attention: false,
-      title: "Силовые тренировки",
-      text: "ВОЗ рекомендует взрослым силовые упражнения умеренной или большей интенсивности на все основные группы мышц — 2 дня в неделю или больше.",
-      source: TIP_SOURCES.whoActivity,
-    });
-  }
-
-  // While waist or belly is new to the user (fewer than 3 measurements), remind how to measure.
-  const waistCount = Math.max(waist?.count ?? 0, byKind.get("belly")?.count ?? 0);
+  // While waist is new to the user (fewer than 3 measurements), remind how to measure.
+  const waistCount = waist?.count ?? 0;
   if (waistCount > 0 && waistCount < 3) {
     tips.push({
       id: "how-to-measure",
@@ -206,7 +195,7 @@ export function getHealthTips({ latest, weightSeries, profile }: TipInput): Tip[
     id: "activity",
     attention: false,
     title: "Сколько двигаться",
-    text: "ВОЗ рекомендует взрослым 150–300 минут умеренной или 75–150 минут интенсивной аэробной активности в неделю.",
+    text: "ВОЗ рекомендует взрослым 150–300 минут умеренной или 75–150 минут интенсивной аэробной активности в неделю, а ещё силовые упражнения на все основные группы мышц — 2 дня в неделю или больше.",
     source: TIP_SOURCES.whoActivity,
   });
 

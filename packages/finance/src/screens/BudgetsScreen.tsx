@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { TextField } from "@ecosystem/core";
 import { db, budgets as budgetsTable, categories as categoriesTable } from "@ecosystem/db";
 import { eq } from "drizzle-orm";
 import { useAsyncData } from "../hooks/useAsyncData";
@@ -96,8 +97,8 @@ export function BudgetsScreen() {
             <Chip key={c.id} label={c.name} selected={categoryId === c.id} onPress={() => setCategoryId(c.id)} />
           ))}
         </View>
-        <TextInput
-          style={styles.input}
+        <TextField
+          style={styles.field}
           placeholder="Лимит, 0,00"
           keyboardType="decimal-pad"
           value={limitText}
@@ -126,16 +127,7 @@ const styles = StyleSheet.create({
   form: { marginTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "#e5e5ea", paddingTop: 16 },
   sectionTitle: { fontSize: 14, fontWeight: "600", color: "#1c1c1e", marginBottom: 8 },
   chipRow: { flexDirection: "row", flexWrap: "wrap" },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d1d1d6",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#1c1c1e",
-    marginBottom: 10,
-  },
+  field: { marginBottom: 10 },
   saveButton: { backgroundColor: "#1c1c1e", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
   saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
   error: { color: "#c62828", fontSize: 14, marginBottom: 10 },
