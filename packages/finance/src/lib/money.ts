@@ -1,5 +1,8 @@
-/** Formats an integer amount in minor units (e.g. kopecks) as a display string, e.g. 150050 -> "1 500,50 ₽". */
-export function formatMinorUnits(minorUnits: number, currency: string): string {
+/** The only currency the app works in: Belarusian rubles (ISO 4217 code BYN). */
+export const APP_CURRENCY = "BYN";
+
+/** Formats an integer amount in minor units (e.g. kopecks) as a display string, e.g. 150050 -> "1 500,50 BYN". */
+export function formatMinorUnits(minorUnits: number, currency: string = APP_CURRENCY): string {
   const major = minorUnits / 100;
   const formatted = new Intl.NumberFormat("ru-RU", {
     minimumFractionDigits: 2,

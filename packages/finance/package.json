@@ -12,7 +12,8 @@
     "expo-router": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-android-widget": "*"
+    "react-native-android-widget": "*",
+    "react-native-svg": "*"
   },
   "devDependencies": {
     "@types/react": "*",

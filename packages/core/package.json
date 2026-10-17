@@ -11,6 +11,10 @@
   },
   "devDependencies": {
     "@types/react": "*",
-    "typescript": "*"
+    "typescript": "*",
+    "tsx": "*"
+  },
+  "scripts": {
+    "test": "tsx --test src/*.test.ts"
   }
 }

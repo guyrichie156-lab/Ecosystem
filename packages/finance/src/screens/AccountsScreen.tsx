@@ -5,7 +5,7 @@ import { db, accounts as accountsTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
 import { getAccountBalance } from "../lib/balance";
-import { formatMinorUnits, parseMinorUnits } from "../lib/money";
+import { APP_CURRENCY, formatMinorUnits, parseMinorUnits } from "../lib/money";
 import { Chip } from "../components/Chip";
 
 type AccountType = "cash" | "bank" | "card" | "savings";
@@ -47,7 +47,7 @@ export function AccountsScreen() {
       await db.insert(accountsTable).values({
         name: name.trim(),
         type,
-        currency: "RUB",
+        currency: APP_CURRENCY,
         initialBalance: initial,
       });
       setName("");
