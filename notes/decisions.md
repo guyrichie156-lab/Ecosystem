@@ -1,5 +1,12 @@
 # Журнал решений
 
+## 2026-10-17 (APK из облака)
+- Release APK собран в облаке из ветки `feature/health-connect` и отправлен пользователю файлом. В нём «Финансы» без истории транзакций (она в `feature/finance-history`) и «Здоровье» с подсказками и Health Connect. Как собрать и что проверено: [[architecture]].
+- Только процессоры ARM (`arm64-v8a`, `armeabi-v7a`): x86 нужен лишь эмуляторам.
+- Maven Central (и Gradle Plugin Portal, который переадресует туда) отвечал 429. В облаке Gradle читает его через зеркало Google; init-скрипт лежит только в облачной среде, в проект не входит.
+- APK подписан отладочным ключом шаблона Expo. Android ставит обновление поверх, только если подпись та же: https://developer.android.com/studio/publish/app-signing («users can only update your app if the update is signed with the same signing key»). Если подписи разные, старую версию придётся удалить вместе с данными.
+- На телефоне приложение называется «mobile» (`expo.name` в `app.json`).
+
 ## 2026-10-17 (Health Connect)
 - Ветка `feature/health-connect` от `feature/health-tips` (импорт кладёт данные в модуль замеров).
 - Импорт из Health Connect: вес, процент жира (новая зона), рост; при запуске в фоне и по кнопке. Подробнее и источники — [[health-module]].

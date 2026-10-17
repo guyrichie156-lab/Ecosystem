@@ -17,7 +17,12 @@ Release-APK подписан отладочным ключом: так наст�
 Ещё вариант — облачная сборка EAS Build с `"buildType": "apk"`: https://docs.expo.dev/build-reference/apk/
 
 ### Сборка APK в облачной среде Claude (2026-10-17)
-Статус на 2026-10-17: с этими шагами в облаке проходят настройка всех проектов Gradle и сборка JS-кода (1633 модуля); полная сборка APK идёт, итог будет дописан.
+Работает: 2026-10-17 release APK собран из ветки `feature/health-connect` и отправлен пользователю файлом.
+- `assembleRelease` — 11 мин 49 с по выводу Gradle (1045 задач, 4 ядра); C++ собирала CMake 3.22.1 из `/opt/android-sdk`.
+- APK — 65 746 830 байт (62,7 МБ): `arm64-v8a` и `armeabi-v7a`, minSdk 26, targetSdk 36 (`aapt2 dump badging`).
+- Подпись — отладочный ключ шаблона, схема v2, SHA-1 сертификата `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25` (`apksigner verify --print-certs`).
+- JS внутри — байткод Hermes (файл начинается с магического числа Hermes `c6 1f bc 03 c1 03 19 1f`), 1633 модуля; строки интерфейса на месте. Экранов expo-dev-client в манифесте нет: в release он не подключается (`node_modules/expo-dev-launcher/android/build.gradle`, свойство `expo.devlauncher.configureInRelease`).
+- На телефоне не запускался: в облаке это проверить нечем.
 
 Обязательное условие — домен `dl.google.com` в разрешённых доменах окружения (Network access → Allowed domains): https://code.claude.com/docs/en/cloud-environments#network-access . Там Android Gradle Plugin, Android SDK и NDK; пользователь разрешил его 2026-10-17.
 

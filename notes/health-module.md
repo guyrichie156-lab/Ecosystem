@@ -56,7 +56,8 @@
 - Код библиотеки при импорте сразу ищет нативный модуль, поэтому на iOS и в вебе он не загружается: там работает заглушка `lib/healthConnect.ts`, на Android Metro берёт `lib/healthConnect.android.ts`.
 
 Что проверено в облаке: 20 автотестов «Здоровья» (7 — на преобразование записей и окна импорта); проверка типов обеих версий адаптера (`pnpm typecheck`); `expo prebuild` — разрешения, обработчик `ACTION_SHOW_PERMISSIONS_RATIONALE`, псевдоним `ViewPermissionUsageActivity`, `minSdkVersion=26`; автолинковка видит обе нативные части библиотеки; в сборке iOS и веба нет ни одного файла библиотеки; путь импорта в базу (дубликаты, повторный импорт, рост, обновление экрана) — в браузере с подменёнными данными; миграция `0003` сохраняет старые замеры.
-Не проверено: полная сборка Android (в облаке идёт с 2026-10-17, см. [[architecture]]) и работа с настоящим Health Connect на телефоне.
+Полная сборка Android (release APK) прошла в облаке 2026-10-17, см. [[architecture]]. В манифесте готового APK есть три разрешения Health Connect, обработчик `ACTION_SHOW_PERMISSIONS_RATIONALE`, псевдоним с `VIEW_PERMISSION_USAGE` и `HEALTH_PERMISSIONS`, запрос пакета `com.google.android.apps.healthdata` (`aapt2 dump xmltree`).
+Не проверено: работа на телефоне и с настоящим Health Connect.
 
 ## Ограничения (проверено 2026-10-04)
 - В Health Connect есть вес, процент жира, рост, сухая масса, масса воды, костная масса, базовый обмен. Типов для обхватов в списке нет: https://developer.android.com/health-and-fitness/health-connect/data-types
