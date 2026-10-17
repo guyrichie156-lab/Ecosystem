@@ -67,8 +67,6 @@ export function MonthlyBars({ months }: { months: MonthSpend[] }) {
       <View
         onLayout={onLayout}
         style={{ height: HEIGHT }}
-        onStartShouldSetResponder={() => true}
-        onResponderGrant={onPlotPress}
         accessible
         accessibilityLabel={`Расходы по месяцам: ${months
           .map((m) => `${monthShort.format(new Date(m.monthStart))} ${formatMinorUnits(m.amount)}`)
@@ -108,6 +106,8 @@ export function MonthlyBars({ months }: { months: MonthSpend[] }) {
             })}
           </Svg>
         )}
+        {/* Taps land on this plain layer, never on an SVG shape (react-native-svg can make a shape the touch target), so locationX is always measured from the chart. */}
+        <View style={StyleSheet.absoluteFill} onStartShouldSetResponder={() => true} onResponderGrant={onPlotPress} />
       </View>
       <Pressable onPress={() => setShowTable(!showTable)} hitSlop={8} accessibilityRole="button">
         <Text style={styles.toggle}>{showTable ? "Скрыть цифры" : "Показать цифрами"}</Text>

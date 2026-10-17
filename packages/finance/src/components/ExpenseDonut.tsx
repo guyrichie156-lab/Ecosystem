@@ -61,8 +61,6 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
     <View>
       <View
         style={styles.ring}
-        onStartShouldSetResponder={() => true}
-        onResponderGrant={onRingPress}
         accessible
         accessibilityLabel={`Расходы за ${monthName}: ${formatMinorUnits(total)}. Доли категорий — в списке ниже.`}
       >
@@ -90,6 +88,8 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
             {center.small}
           </Text>
         </View>
+        {/* Taps land on this plain layer, never on an SVG shape (react-native-svg can make a shape the touch target), so locationX is always measured from the chart. */}
+        <View style={StyleSheet.absoluteFill} onStartShouldSetResponder={() => true} onResponderGrant={onRingPress} />
       </View>
 
       {segments.map((s, i) => (
