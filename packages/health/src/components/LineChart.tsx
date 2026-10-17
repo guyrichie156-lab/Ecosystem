@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Platform, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
+import { Platform, StyleSheet, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
 import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
 import { niceTicks } from "../lib/ticks";
 
@@ -68,8 +68,6 @@ export function LineChart({
     <View
       onLayout={onLayout}
       style={{ height: HEIGHT }}
-      onStartShouldSetResponder={() => true}
-      onResponderGrant={selectNearest}
       accessible
       accessibilityLabel={accessibilityLabel}
     >
@@ -105,6 +103,8 @@ export function LineChart({
           ))}
         </Svg>
       )}
+      {/* Taps land on this plain layer, never on an SVG shape (react-native-svg can make a shape the touch target), so locationX is always measured from the chart. */}
+      <View style={StyleSheet.absoluteFill} onStartShouldSetResponder={() => true} onResponderGrant={selectNearest} />
     </View>
   );
 }
