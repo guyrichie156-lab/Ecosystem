@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
 import { db, accounts as accountsTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { getAccountBalance } from "../lib/balance";
@@ -25,10 +25,20 @@ export function AccountsScreen() {
   const [type, setType] = useState<AccountType>("cash");
   const [initialBalanceText, setInitialBalanceText] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
-    if (!name.trim()) return;
-    const initial = parseMinorUnits(initialBalanceText || "0") ?? 0;
+    if (!name.trim()) {
+      setError("Введите название счёта.");
+      return;
+    }
+    // Negative is allowed: a credit card or a debt starts below zero.
+    const initial = parseMinorUnits(initialBalanceText || "0", { allowNegative: true });
+    if (initial === null) {
+      setError("Начальный баланс — число, например 1 000 или -500,50.");
+      return;
+    }
+    setError(null);
     setSaving(true);
     try {
       await db.insert(accountsTable).values({
@@ -71,10 +81,12 @@ export function AccountsScreen() {
         <TextInput
           style={styles.input}
           placeholder="Начальный баланс, 0,00"
-          keyboardType="decimal-pad"
+          // decimal-pad has no minus key on iOS; this keyboard has one.
+          keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
           value={initialBalanceText}
           onChangeText={setInitialBalanceText}
         />
+        {error && <Text style={styles.error}>{error}</Text>}
         <Pressable style={styles.saveButton} onPress={handleCreate} disabled={saving}>
           <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Добавить счёт"}</Text>
         </Pressable>
@@ -110,4 +122,5 @@ const styles = StyleSheet.create({
   },
   saveButton: { backgroundColor: "#1c1c1e", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
   saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
+  error: { color: "#c62828", fontSize: 14, marginBottom: 10 },
 });

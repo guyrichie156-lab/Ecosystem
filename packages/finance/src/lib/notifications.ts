@@ -1,6 +1,8 @@
+import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import { getActiveAccounts, getAccountBalance, getBudgetStatuses } from "./balance";
 import { formatMinorUnits } from "./money";
+import { updateBalanceWidget } from "../widget/updateWidget";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,15 +22,28 @@ export async function ensureNotificationPermission(): Promise<boolean> {
 }
 
 async function notifyNow(title: string, body: string) {
+  // expo-notifications can't schedule on web (it throws UnavailabilityError).
+  if (Platform.OS === "web") return;
   await Notifications.scheduleNotificationAsync({
     content: { title, body },
     trigger: null,
   });
 }
 
-/** Call right after a transaction is saved: checks budgets and account balances, fires local notifications for anything crossed. */
-export async function runPostTransactionChecks(): Promise<void> {
-  const statuses = await getBudgetStatuses();
+export type TransactionScope = {
+  /** Category of the saved expense; only its budget is checked. Null for income and transfers. */
+  categoryId: number | null;
+  /** Accounts whose balance the transaction changed. */
+  accountIds: number[];
+};
+
+/**
+ * Call right after a transaction is saved: checks the budget and balances it touched and fires local
+ * notifications for anything at or over its limit. Other budgets are left alone, so an overspent
+ * budget doesn't re-notify on every unrelated transaction.
+ */
+export async function runPostTransactionChecks(scope: TransactionScope): Promise<void> {
+  const statuses = scope.categoryId === null ? [] : (await getBudgetStatuses()).filter((b) => b.categoryId === scope.categoryId);
   for (const b of statuses) {
     if (b.amountLimit <= 0) continue;
     const pct = b.spent / b.amountLimit;
@@ -45,7 +60,7 @@ export async function runPostTransactionChecks(): Promise<void> {
     }
   }
 
-  const accounts = await getActiveAccounts();
+  const accounts = (await getActiveAccounts()).filter((a) => scope.accountIds.includes(a.id));
   for (const account of accounts) {
     if (account.lowBalanceThreshold == null) continue;
     const balance = await getAccountBalance(account.id);
@@ -55,5 +70,16 @@ export async function runPostTransactionChecks(): Promise<void> {
         `«${account.name}»: ${formatMinorUnits(balance, account.currency)}`
       );
     }
+  }
+}
+
+/**
+ * Widget refresh and alerts after a transaction is added, changed or deleted. These are extras:
+ * a failure here is logged and never stops the save itself.
+ */
+export async function runAfterTransactionChange(scope: TransactionScope): Promise<void> {
+  const results = await Promise.allSettled([updateBalanceWidget(), runPostTransactionChecks(scope)]);
+  for (const result of results) {
+    if (result.status === "rejected") console.warn("Step after saving a transaction failed", result.reason);
   }
 }

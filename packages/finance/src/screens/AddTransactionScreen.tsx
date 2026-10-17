@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import {
   db,
@@ -9,8 +9,7 @@ import {
 } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { parseMinorUnits } from "../lib/money";
-import { runPostTransactionChecks } from "../lib/notifications";
-import { updateBalanceWidget } from "../widget/updateWidget";
+import { runAfterTransactionChange } from "../lib/notifications";
 import { Chip } from "../components/Chip";
 
 type TxType = "income" | "expense" | "transfer";
@@ -38,25 +37,34 @@ export function AddTransactionScreen() {
   const [amountText, setAmountText] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const filteredCategories = (data?.categories ?? []).filter(
     (c) => c.kind === (type === "income" ? "income" : "expense")
   );
 
+  function handleAccountChange(id: number) {
+    setAccountId(id);
+    // A transfer can't go to the account it comes from.
+    if (counterpartAccountId === id) setCounterpartAccountId(null);
+  }
+
   async function handleSave() {
+    // Shown under the form rather than in Alert, which does nothing on web.
     const amount = parseMinorUnits(amountText);
     if (!amount || amount <= 0) {
-      Alert.alert("Введите сумму", "Например: 1500 или 1500,50");
+      setError("Введите сумму, например 1500 или 1500,50.");
       return;
     }
     if (!accountId) {
-      Alert.alert("Выберите счёт");
+      setError("Выберите счёт.");
       return;
     }
-    if (type === "transfer" && !counterpartAccountId) {
-      Alert.alert("Выберите счёт получателя");
+    if (type === "transfer" && (!counterpartAccountId || counterpartAccountId === accountId)) {
+      setError("Выберите счёт получателя.");
       return;
     }
+    setError(null);
     const account = data?.accounts.find((a) => a.id === accountId);
     if (!account) return;
 
@@ -72,7 +80,10 @@ export function AddTransactionScreen() {
         occurredAt: Date.now(),
         note: note || null,
       });
-      await Promise.all([updateBalanceWidget(), runPostTransactionChecks()]);
+      await runAfterTransactionChange({
+        categoryId: type === "expense" ? categoryId : null,
+        accountIds: type === "transfer" ? [accountId, counterpartAccountId!] : [accountId],
+      });
       router.back();
     } finally {
       setSaving(false);
@@ -91,7 +102,7 @@ export function AddTransactionScreen() {
       <Text style={styles.sectionTitle}>Счёт</Text>
       <View style={styles.chipRow}>
         {(data?.accounts ?? []).map((a) => (
-          <Chip key={a.id} label={a.name} selected={accountId === a.id} onPress={() => setAccountId(a.id)} />
+          <Chip key={a.id} label={a.name} selected={accountId === a.id} onPress={() => handleAccountChange(a.id)} />
         ))}
       </View>
 
@@ -136,6 +147,8 @@ export function AddTransactionScreen() {
       <Text style={styles.sectionTitle}>Заметка</Text>
       <TextInput style={styles.input} placeholder="Необязательно" value={note} onChangeText={setNote} />
 
+      {error && <Text style={styles.error}>{error}</Text>}
+
       <Pressable style={styles.saveButton} onPress={handleSave} disabled={saving}>
         <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Сохранить"}</Text>
       </Pressable>
@@ -165,4 +178,5 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
+  error: { color: "#c62828", fontSize: 14, marginTop: 16 },
 });
