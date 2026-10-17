@@ -24,9 +24,9 @@ export function FinanceHomeScreen() {
     <View style={styles.container}>
       <View style={styles.hero}>
         <Text style={styles.label}>Баланс</Text>
-        <Text style={styles.balance}>{data ? formatMinorUnits(data.total, "RUB") : "…"}</Text>
+        <Text style={styles.balance}>{data ? formatMinorUnits(data.total) : "…"}</Text>
         <Text style={styles.subLabel}>
-          Траты за месяц: {data ? formatMinorUnits(data.spend, "RUB") : "…"}
+          Траты за месяц: {data ? formatMinorUnits(data.spend) : "…"}
         </Text>
       </View>
 

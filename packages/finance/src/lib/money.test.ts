@@ -29,8 +29,9 @@ test("negative amounts only when allowed", () => {
   assert.equal(parseMinorUnits("−1 000,50", { allowNegative: true }), -100050);
 });
 
-test("formats back to rubles", () => {
+test("formats back to Belarusian rubles by default", () => {
   // Intl inserts a narrow no-break space between digit groups for ru-RU.
-  assert.equal(formatMinorUnits(150050, "RUB").replace(/\s/g, " "), "1 500,50 ₽");
-  assert.equal(formatMinorUnits(-50000, "RUB").replace(/\s/g, " "), "-500,00 ₽");
+  assert.equal(formatMinorUnits(150050).replace(/\s/g, " "), "1 500,50 BYN");
+  assert.equal(formatMinorUnits(-50000, "BYN").replace(/\s/g, " "), "-500,00 BYN");
+  assert.equal(formatMinorUnits(1250).replace(/\s/g, " "), "12,50 BYN");
 });

@@ -71,7 +71,7 @@ export function BudgetsScreen() {
               <View style={styles.rowHeader}>
                 <Text style={styles.rowTitle}>{item.categoryName}</Text>
                 <Text style={[styles.rowValue, over && styles.rowValueOver]}>
-                  {formatMinorUnits(item.spent, "RUB")} / {formatMinorUnits(item.amountLimit, "RUB")}
+                  {formatMinorUnits(item.spent)} / {formatMinorUnits(item.amountLimit)}
                 </Text>
               </View>
               <View style={styles.progressTrack}>

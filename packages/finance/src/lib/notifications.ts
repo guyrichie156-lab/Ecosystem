@@ -50,7 +50,7 @@ export async function runPostTransactionChecks(scope: TransactionScope): Promise
     if (pct >= 1) {
       await notifyNow(
         "Бюджет превышен",
-        `«${b.categoryName}»: потрачено ${formatMinorUnits(b.spent, "RUB")} из ${formatMinorUnits(b.amountLimit, "RUB")}`
+        `«${b.categoryName}»: потрачено ${formatMinorUnits(b.spent)} из ${formatMinorUnits(b.amountLimit)}`
       );
     } else if (pct >= 0.9) {
       await notifyNow(

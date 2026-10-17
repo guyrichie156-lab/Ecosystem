@@ -29,6 +29,13 @@
       "when": 1792251602945,
       "tag": "0003_sour_triton",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792263482410,
+      "tag": "0004_currency_byn",
+      "breakpoints": true
     }
   ]
 }

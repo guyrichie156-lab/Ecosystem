@@ -5,6 +5,8 @@ export const accounts = sqliteTable("accounts", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   type: text("type", { enum: ["cash", "bank", "card", "savings"] }).notNull(),
+  // The column default stays as created in 0000 (changing it means rebuilding the table);
+  // the app always writes APP_CURRENCY explicitly.
   currency: text("currency").notNull().default("RUB"),
   // Minor units (e.g. kopecks/cents), never a float.
   initialBalance: integer("initial_balance").notNull().default(0),
