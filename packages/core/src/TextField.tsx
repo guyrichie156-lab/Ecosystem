@@ -42,6 +42,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: "#1c1c1e",
+    // Browsers draw their own dark focus ring over the border; the blue border already marks focus.
+    outlineStyle: "solid",
+    outlineWidth: 0,
   },
   // The thicker border eats into the padding so the text doesn't jump on focus.
   focused: {
