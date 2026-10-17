@@ -4,7 +4,7 @@
   "private": true,
   "description": "",
   "scripts": {
-    "test": "pnpm --filter @ecosystem/health test"
+    "test": "pnpm -r --if-present test"
   },
   "keywords": [],
   "author": "",
