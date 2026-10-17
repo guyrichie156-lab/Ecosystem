@@ -78,6 +78,7 @@ export function MeasurementDetailScreen({ kind }: { kind: BodyMeasurementKind })
               selectedIndex={selected}
               onSelect={setSelected}
               formatTick={(v) => tickFormat.format(v)}
+              minTickStep={0.1}
               accessibilityLabel={`График: ${info.label}, ${points.length} замеров. Значения — в списке ниже.`}
             />
           ) : (
