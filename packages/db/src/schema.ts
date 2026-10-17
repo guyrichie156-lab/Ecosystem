@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const accounts = sqliteTable("accounts", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -49,6 +49,31 @@ export const budgets = sqliteTable("budgets", {
   // Format: "YYYY-MM"
   startMonth: text("start_month").notNull(),
 });
+
+export const BODY_MEASUREMENT_KINDS = [
+  "weight",
+  "neck",
+  "chest",
+  "waist",
+  "belly",
+  "hips",
+  "biceps",
+  "thigh",
+] as const;
+export type BodyMeasurementKind = (typeof BODY_MEASUREMENT_KINDS)[number];
+
+// One value per row; the rows saved together share `measured_at` and form one check-in.
+export const bodyMeasurements = sqliteTable(
+  "body_measurements",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    kind: text("kind", { enum: BODY_MEASUREMENT_KINDS }).notNull(),
+    // Integers, never floats: grams for "weight", millimetres for every circumference.
+    value: integer("value").notNull(),
+    measuredAt: integer("measured_at").notNull(),
+  },
+  (t) => [index("body_measurements_kind_measured_at").on(t.kind, t.measuredAt)]
+);
 
 export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions, { relationName: "accountTransactions" }),

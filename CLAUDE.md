@@ -1,6 +1,6 @@
 # Ecosystem
 
-pnpm monorepo: `apps/mobile` (Expo SDK 57 app), `packages/core` (module system), `packages/finance`, `packages/db` (drizzle + expo-sqlite).
+pnpm monorepo: `apps/mobile` (Expo SDK 57 app), `packages/core` (module system, shared hooks), `packages/finance`, `packages/health`, `packages/db` (drizzle + expo-sqlite; schema changes need `npx drizzle-kit generate` in `packages/db`).
 Before writing Expo code, follow `apps/mobile/AGENTS.md`.
 
 ## Project memory

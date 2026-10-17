@@ -3,12 +3,14 @@
 import journal from './meta/_journal.json';
 import m0000 from './0000_many_doctor_doom.sql';
 import m0001 from './0001_typical_vivisector.sql';
+import m0002 from './0002_lumpy_kat_farrell.sql';
 
   export default {
     journal,
     migrations: {
       m0000,
-m0001
+m0001,
+m0002
     }
   }
   
