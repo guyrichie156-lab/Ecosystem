@@ -16,6 +16,11 @@ export default function FinanceLayout() {
         name="add-transaction"
         options={{ title: "Новая транзакция", presentation: "modal" }}
       />
+      <Stack.Screen name="history" options={{ title: "История" }} />
+      <Stack.Screen
+        name="transaction/[id]"
+        options={{ title: "Транзакция", presentation: "modal" }}
+      />
     </Stack>
   );
 }

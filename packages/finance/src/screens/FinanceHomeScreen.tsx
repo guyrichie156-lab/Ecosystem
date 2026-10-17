@@ -4,6 +4,7 @@ import { Link } from "expo-router";
 import { getAccountBalance, getActiveAccounts, getThisMonthSpend, getTotalBalance } from "../lib/balance";
 import { formatMinorUnits } from "../lib/money";
 import { useAsyncData } from "../hooks/useAsyncData";
+import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
 
 export function FinanceHomeScreen() {
   const { data, loading, refresh } = useAsyncData(async () => {
@@ -17,6 +18,7 @@ export function FinanceHomeScreen() {
     );
     return { total, spend, accounts: accountsWithBalance };
   }, []);
+  useRefreshOnFocus(refresh);
 
   return (
     <View style={styles.container}>
@@ -42,6 +44,11 @@ export function FinanceHomeScreen() {
         <Link href="/finance/budgets" asChild>
           <Pressable style={styles.actionButtonSecondary}>
             <Text style={styles.actionButtonSecondaryText}>Бюджеты</Text>
+          </Pressable>
+        </Link>
+        <Link href="/finance/history" asChild>
+          <Pressable style={styles.actionButtonSecondary}>
+            <Text style={styles.actionButtonSecondaryText}>История</Text>
           </Pressable>
         </Link>
       </View>
@@ -71,7 +78,7 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, color: "#8a8a8e" },
   balance: { fontSize: 36, fontWeight: "700", color: "#1c1c1e", marginTop: 4 },
   subLabel: { fontSize: 14, color: "#8a8a8e", marginTop: 4 },
-  actions: { flexDirection: "row", gap: 8, marginBottom: 24 },
+  actions: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 24 },
   actionButton: {
     backgroundColor: "#1c1c1e",
     paddingVertical: 12,
