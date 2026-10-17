@@ -31,7 +31,7 @@ The user prioritises speed. Tabs render on first visit (`lazy`, default `true`).
 
 - Web: `cd apps/mobile && pnpm web` → http://localhost:8081
 - Android (dev, by cable): `cd apps/mobile && pnpm android`
-- Android APK: `cd apps/mobile && pnpm android:release`
+- Android APK: `cd apps/mobile && pnpm android:release`. In the Claude cloud environment it needs extra setup (Java 17, Android SDK, Maven Central mirror): see `notes/architecture.md`.
 - Typecheck: `cd apps/mobile && pnpm typecheck` (twice: as-is, and with `.android` files via `tsconfig.android.json`)
 - Tests: `pnpm test` (root; health tip rules)
 

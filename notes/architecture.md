@@ -16,11 +16,44 @@ Expo собирает настоящее Android-приложение (APK) и i
 Release-APK подписан отладочным ключом: так настроен шаблон Expo SDK 57 (`expo-template-bare-minimum` 57.0.32, `android/app/build.gradle`). Для своего телефона подходит, для Google Play нужен свой ключ.
 Ещё вариант — облачная сборка EAS Build с `"buildType": "apk"`: https://docs.expo.dev/build-reference/apk/
 
-### Сборка APK в облачной среде Claude (проверено 2026-10-17)
-Без настройки сети не получается. Где остановилась `./gradlew assembleDebug`:
-1. Плагину React Native нужна Java 17, в среде только 21; Gradle пытается скачать её с `api.foojay.io` — прокси отвечает 403. Обход: `apt-get install -y openjdk-17-jdk-headless` и `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64` (ставится заново в каждой новой сессии).
-2. Maven Central иногда отвечает 429 (слишком много запросов) — проходит при повторе с `--max-workers=2`.
-3. `dl.google.com` (хранилище Google: Android Gradle Plugin, Android SDK, NDK) — 403. Дальше без него никак: нужно добавить `dl.google.com` в разрешённые домены окружения (Network access → Allowed domains): https://code.claude.com/docs/en/cloud-environments#network-access . `www.jitpack.io` из списка репозиториев тоже закрыт.
+### Сборка APK в облачной среде Claude (2026-10-17)
+Статус на 2026-10-17: с этими шагами в облаке проходят настройка всех проектов Gradle и сборка JS-кода (1633 модуля); полная сборка APK идёт, итог будет дописан.
+
+Обязательное условие — домен `dl.google.com` в разрешённых доменах окружения (Network access → Allowed domains): https://code.claude.com/docs/en/cloud-environments#network-access . Там Android Gradle Plugin, Android SDK и NDK; пользователь разрешил его 2026-10-17.
+
+Остальное ставится заново в каждой новой сессии:
+1. Java 17: `apt-get install -y openjdk-17-jdk-headless`, `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64`. Плагину React Native нужна 17, в среде 21, а сам Gradle скачать её не может (`api.foojay.io` отвечает 403).
+2. Android SDK в `/opt/android-sdk`: command-line tools с `dl.google.com`, затем `sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006" "cmake;3.22.1"`. Версии платформы, build-tools и NDK — из `node_modules/react-native/gradle/libs.versions.toml`.
+3. Maven Central отвечает 429 (слишком много запросов) — и напрямую, и когда Gradle Plugin Portal переадресует туда (ответ 303). Повторы не помогли. Обход — init-скрипт Gradle `~/.gradle/init.d/maven-central-mirror.gradle` (текст ниже): Maven Central читается через зеркало Google.
+4. `cd apps/mobile && CI=1 npx expo prebuild --platform android --no-install`, затем файл `android/local.properties` со строкой `sdk.dir=/opt/android-sdk`.
+5. `cd android && NODE_ENV=production ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a`. Только ARM: x86 нужен эмуляторам, без него сборка короче и файл меньше.
+
+Эмулятор Android в облаке не запустить: нет `/dev/kvm` (аппаратного ускорения). `www.jitpack.io` закрыт, но сборке не понадобился.
+
+```groovy
+// ~/.gradle/init.d/maven-central-mirror.gradle
+def mirror = "https://maven-central.storage-download.googleapis.com/maven2/"
+def centralHosts = ["repo.maven.apache.org", "repo1.maven.org"]
+def redirect = { RepositoryHandler repos ->
+  repos.withType(MavenArtifactRepository).configureEach { repo ->
+    if (repo.url?.host in centralHosts) repo.url = mirror
+  }
+}
+beforeSettings { settings ->
+  settings.pluginManagement.repositories {
+    maven { name = "MavenCentralMirror"; url = mirror }
+    google()
+    gradlePluginPortal()
+  }
+  redirect(settings.buildscript.repositories)
+  redirect(settings.pluginManagement.repositories)
+  redirect(settings.dependencyResolutionManagement.repositories)
+}
+allprojects { project ->
+  redirect(project.buildscript.repositories)
+  redirect(project.repositories)
+}
+```
 
 ## Модули
 Каждая функция — отдельный модуль. Это нужно для разработки: функцию можно менять в своей ветке Git, не трогая остальные.
