@@ -3,7 +3,10 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "rea
 import { Link, useRouter } from "expo-router";
 import { useAsyncData, useRefreshOnFocus } from "@ecosystem/core";
 import { BODY_MEASUREMENT_KINDS, KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
-import { getLatestMeasurements, type LatestMeasurement } from "../lib/measurements";
+import { getLatestMeasurements, getMeasurementSeries, type LatestMeasurement } from "../lib/measurements";
+import { getHealthProfile } from "../lib/profile";
+import { getHealthTips } from "../lib/tips";
+import { TipCard } from "../components/TipCard";
 
 const dayFormat = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" });
 
@@ -32,11 +35,26 @@ function ZoneRow({
 
 export function HealthHomeScreen() {
   const router = useRouter();
-  const { data, loading, refresh } = useAsyncData(getLatestMeasurements, []);
+  const { data, loading, refresh } = useAsyncData(async () => {
+    const [latest, weightSeries] = await Promise.all([getLatestMeasurements(), getMeasurementSeries("weight")]);
+    const profile = getHealthProfile();
+    return { latest, profile, tips: getHealthTips({ latest, weightSeries, profile }) };
+  }, []);
   useRefreshOnFocus(refresh);
 
-  const byKind = new Map((data ?? []).map((m) => [m.kind, m]));
-  const lastDate = data && data.length > 0 ? Math.max(...data.map((m) => m.measuredAt)) : null;
+  const latest = data?.latest ?? [];
+  const byKind = new Map(latest.map((m) => [m.kind, m]));
+  const lastDate = latest.length > 0 ? Math.max(...latest.map((m) => m.measuredAt)) : null;
+  const tips = data?.tips ?? [];
+  const attentionTips = tips.filter((t) => t.attention);
+  const otherTips = tips.filter((t) => !t.attention);
+  const openProfile = () => router.push("/health/profile");
+  const profile = data?.profile;
+  const profileSummary = profile
+    ? [profile.heightMm ? `${profile.heightMm / 10} см` : null, profile.sex === "male" ? "мужской" : profile.sex === "female" ? "женский" : null]
+        .filter(Boolean)
+        .join(", ") || "не указаны"
+    : "";
 
   return (
     <FlatList
@@ -59,14 +77,39 @@ export function HealthHomeScreen() {
               <Text style={styles.addButtonText}>+ Новый замер</Text>
             </Pressable>
           </Link>
-          <Text style={styles.sectionTitle}>Зоны</Text>
+          <Link href="/health/profile" asChild>
+            <Pressable style={styles.profileRow}>
+              <Text style={styles.profileLabel}>Рост и пол</Text>
+              <Text style={styles.profileValue}>{profileSummary} ›</Text>
+            </Pressable>
+          </Link>
+          {/* Tips that need attention go above the zones; the rest follow them. */}
+          {attentionTips.map((tip) => (
+            <TipCard key={tip.id} tip={tip} onAction={openProfile} />
+          ))}
+          <Text style={[styles.sectionTitle, attentionTips.length > 0 && styles.zonesTitle]}>Зоны</Text>
         </View>
       }
       renderItem={({ item }) => (
         <ZoneRow kind={item} latest={byKind.get(item)} onPress={(kind) => router.push(`/health/${kind}`)} />
       )}
       ListFooterComponent={
-        <Text style={styles.hint}>Справа — изменение с предыдущего замера. Нажмите на зону, чтобы увидеть график.</Text>
+        <View>
+          <Text style={styles.hint}>Справа — изменение с предыдущего замера. Нажмите на зону, чтобы увидеть график.</Text>
+          {otherTips.length > 0 && (
+            <>
+              <Text style={[styles.sectionTitle, styles.zonesTitle]}>Подсказки</Text>
+              {otherTips.map((tip) => (
+                <TipCard key={tip.id} tip={tip} onAction={openProfile} />
+              ))}
+            </>
+          )}
+          {data && data.tips.length > 0 && (
+            <Text style={styles.disclaimer}>
+              Подсказки — справочная информация из открытых рекомендаций, не медицинская консультация.
+            </Text>
+          )}
+        </View>
       }
     />
   );
@@ -82,10 +125,23 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
     marginTop: 16,
-    marginBottom: 24,
+    marginBottom: 12,
   },
   addButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
-  sectionTitle: { fontSize: 16, fontWeight: "600", color: "#1c1c1e", marginBottom: 4 },
+  profileRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    marginBottom: 16,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "#e5e5ea",
+  },
+  profileLabel: { fontSize: 15, color: "#1c1c1e" },
+  profileValue: { fontSize: 15, color: "#8a8a8e" },
+  disclaimer: { fontSize: 12, color: "#8a8a8e", marginTop: 2 },
+  zonesTitle: { marginTop: 24 },
+  sectionTitle: { fontSize: 16, fontWeight: "600", color: "#1c1c1e", marginBottom: 8 },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",

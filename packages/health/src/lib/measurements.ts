@@ -18,22 +18,37 @@ export type LatestMeasurement = {
   measuredAt: number;
   /** The value before the latest one, if there is one. */
   previous: number | null;
+  /** How many times this zone has been measured. */
+  count: number;
 };
 
 /** Latest and previous value of every zone that has at least one measurement. */
 export async function getLatestMeasurements(): Promise<LatestMeasurement[]> {
   // Rank each zone's rows newest first; ranks 1 and 2 are all the summary needs.
-  const rows = await db.all<{ kind: BodyMeasurementKind; value: number; measured_at: number; rank: number }>(sql`
-    SELECT kind, value, measured_at, rank FROM (
+  const rows = await db.all<{
+    kind: BodyMeasurementKind;
+    value: number;
+    measured_at: number;
+    rank: number;
+    count: number;
+  }>(sql`
+    SELECT kind, value, measured_at, rank, count FROM (
       SELECT kind, value, measured_at,
-        ROW_NUMBER() OVER (PARTITION BY kind ORDER BY measured_at DESC, id DESC) AS rank
+        ROW_NUMBER() OVER (PARTITION BY kind ORDER BY measured_at DESC, id DESC) AS rank,
+        COUNT(*) OVER (PARTITION BY kind) AS count
       FROM body_measurements
     )
     WHERE rank <= 2
   `);
   const latest = new Map<BodyMeasurementKind, LatestMeasurement>();
   for (const row of rows.filter((r) => r.rank === 1)) {
-    latest.set(row.kind, { kind: row.kind, value: row.value, measuredAt: row.measured_at, previous: null });
+    latest.set(row.kind, {
+      kind: row.kind,
+      value: row.value,
+      measuredAt: row.measured_at,
+      previous: null,
+      count: row.count,
+    });
   }
   for (const row of rows.filter((r) => r.rank === 2)) {
     const entry = latest.get(row.kind);

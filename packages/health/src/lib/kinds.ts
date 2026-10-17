@@ -1,4 +1,5 @@
-import { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind } from "@ecosystem/db";
+// The schema file, not the package root: the root also opens the database, which tests can't do.
+import { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind } from "@ecosystem/db/src/schema";
 
 export { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind };
 

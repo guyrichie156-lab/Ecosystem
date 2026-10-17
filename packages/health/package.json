@@ -9,12 +9,17 @@
     "@ecosystem/db": "workspace:*",
     "drizzle-orm": "*",
     "expo-router": "*",
+    "expo-sqlite": "~57.0.1",
     "react": "*",
     "react-native": "*",
     "react-native-svg": "*"
   },
   "devDependencies": {
     "@types/react": "*",
-    "typescript": "*"
+    "typescript": "*",
+    "tsx": "*"
+  },
+  "scripts": {
+    "test": "tsx --test src/lib/*.test.ts"
   }
 }

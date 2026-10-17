@@ -11,6 +11,7 @@ export default function HealthLayout() {
     <Stack screenOptions={{ headerShown: true }}>
       <Stack.Screen name="index" options={{ title: "Здоровье" }} />
       <Stack.Screen name="add" options={{ title: "Новый замер", presentation: "modal" }} />
+      <Stack.Screen name="profile" options={{ title: "Рост и пол", presentation: "modal" }} />
     </Stack>
   );
 }

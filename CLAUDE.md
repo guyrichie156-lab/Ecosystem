@@ -33,5 +33,6 @@ The user prioritises speed. Tabs render on first visit (`lazy`, default `true`).
 - Android (dev, by cable): `cd apps/mobile && pnpm android`
 - Android APK: `cd apps/mobile && pnpm android:release`
 - Typecheck: `cd apps/mobile && npx tsc --noEmit -p .`
+- Tests: `pnpm test` (root; health tip rules)
 
 The Android widget (`react-native-android-widget`) is Android-only; guard its calls with `Platform.OS === "android"`.

@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "",
-  "scripts": {},
+  "scripts": {
+    "test": "pnpm --filter @ecosystem/health test"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
