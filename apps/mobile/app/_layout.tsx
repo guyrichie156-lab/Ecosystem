@@ -3,14 +3,13 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Stack } from "expo-router";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { db, migrations } from "@ecosystem/db";
-import { isModuleEnabled } from "@ecosystem/core";
 import { appModules } from "../modules";
 
-/** Start-up work of each enabled module; one module failing must not block the others. */
-async function startEnabledModules() {
+/** Start-up work of each module; one module failing must not block the others. */
+async function startModules() {
   await Promise.all(
     appModules
-      .filter((module) => module.onReady && isModuleEnabled(module.id))
+      .filter((module) => module.onReady)
       .map(async (module) => {
         try {
           await module.onReady!();
@@ -26,7 +25,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!success) return;
-    startEnabledModules();
+    startModules();
   }, [success]);
 
   if (error) {

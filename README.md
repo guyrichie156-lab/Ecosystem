@@ -54,7 +54,7 @@ npx expo start --go
 ## Структура
 
 - `apps/mobile` — приложение (Expo SDK 57, expo-router); `modules.ts` — список модулей
-- `packages/core` — каркас модулей: включение и выключение на лету, изоляция ошибок
+- `packages/core` — каркас модулей: описание модуля, изоляция ошибок
 - `packages/finance` — модуль «Финансы»: счета, транзакции, бюджеты, Android-виджет
 - `packages/db` — схема и миграции SQLite (drizzle)
 - `patches/` — временный патч expo-sqlite для веба (исправлено в expo-sqlite 58.0.12, удалить при переходе на SDK 58)

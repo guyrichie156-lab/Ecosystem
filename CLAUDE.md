@@ -12,10 +12,11 @@ Before writing Expo code, follow `apps/mobile/AGENTS.md`.
 
 ## Modules
 
-Every feature is a module that can be switched off at runtime without stopping the app.
+Every feature is a separate module, so it can be changed on its own branch without touching the others.
+There are no user-facing on/off switches (the user decided against them on 2026-10-17).
 - A module is a package exporting an `AppModule` (`packages/core/src/types.ts`), listed in `apps/mobile/modules.ts`.
-- Its routes live in `apps/mobile/app/(tabs)/<module id>/`. The module's `_layout.tsx` wraps its navigator in `ModuleGate` and exports `ErrorBoundary` rendering `ModuleErrorFallback`, so a crash stays inside the module.
-- Start-up work goes in `onReady`, never in the root layout; it only runs while the module is enabled.
+- Its routes live in `apps/mobile/app/(tabs)/<module id>/`. The module's `_layout.tsx` exports `ErrorBoundary` rendering `ModuleErrorFallback`, so a crash stays inside the module.
+- Start-up work goes in `onReady`, never in the root layout.
 - Modules don't import each other; shared code goes to `packages/core` or `packages/db`.
 
 ## Git
@@ -24,7 +25,7 @@ Each feature is developed on its own branch (`feature/<name>`) and merged after 
 
 ## Performance
 
-The user prioritises speed. Disabled modules render nothing and run no start-up work; tabs render on first visit (`lazy`, default `true`). Long lists use `FlatList`. Measure before optimising, and report measured numbers, not guesses.
+The user prioritises speed. Tabs render on first visit (`lazy`, default `true`). Long lists use `FlatList`. Measure before optimising, and report measured numbers, not guesses.
 
 ## Running
 

@@ -6,7 +6,6 @@
   "types": "./src/index.ts",
   "dependencies": {
     "expo-router": "*",
-    "expo-sqlite": "~57.0.1",
     "react": "*",
     "react-native": "*"
   },

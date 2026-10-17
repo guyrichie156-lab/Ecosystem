@@ -97,9 +97,6 @@ importers:
       expo-router:
         specifier: '*'
         version: 57.0.11(dd7c0db4b9e9ecd9d5ada4b19e8a901a)
-      expo-sqlite:
-        specifier: ~57.0.1
-        version: 57.0.1(patch_hash=3539f4ec16a77c6f4522a68cc917e6a8133f66b6fb091fa07bee3c14b1791e50)(expo@57.0.11)(react-native@0.86.2(@babel/core@7.29.7)(@react-native/metro-config@0.86.2(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       react:
         specifier: '*'
         version: 19.2.3

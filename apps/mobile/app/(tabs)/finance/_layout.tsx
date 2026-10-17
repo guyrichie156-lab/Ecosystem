@@ -1,5 +1,5 @@
 import { Stack, type ErrorBoundaryProps } from "expo-router";
-import { ModuleErrorFallback, ModuleGate } from "@ecosystem/core";
+import { ModuleErrorFallback } from "@ecosystem/core";
 import { financeModule } from "@ecosystem/finance";
 
 export function ErrorBoundary(props: ErrorBoundaryProps) {
@@ -8,16 +8,14 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
 
 export default function FinanceLayout() {
   return (
-    <ModuleGate module={financeModule}>
-      <Stack screenOptions={{ headerShown: true }}>
-        <Stack.Screen name="index" options={{ title: "Финансы" }} />
-        <Stack.Screen name="accounts" options={{ title: "Счета" }} />
-        <Stack.Screen name="budgets" options={{ title: "Бюджеты" }} />
-        <Stack.Screen
-          name="add-transaction"
-          options={{ title: "Новая транзакция", presentation: "modal" }}
-        />
-      </Stack>
-    </ModuleGate>
+    <Stack screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="index" options={{ title: "Финансы" }} />
+      <Stack.Screen name="accounts" options={{ title: "Счета" }} />
+      <Stack.Screen name="budgets" options={{ title: "Бюджеты" }} />
+      <Stack.Screen
+        name="add-transaction"
+        options={{ title: "Новая транзакция", presentation: "modal" }}
+      />
+    </Stack>
   );
 }

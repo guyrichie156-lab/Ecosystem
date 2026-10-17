@@ -9,8 +9,6 @@ export type AppModule = {
   title: string;
   /** Emoji shown as the tab icon. */
   icon: string;
-  /** One line for the settings screen. */
-  description: string;
-  /** Runs once per app start, after database migrations, only while the module is enabled. */
+  /** Runs once per app start, after database migrations. */
   onReady?: () => void | Promise<void>;
 };
