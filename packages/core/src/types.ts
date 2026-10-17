@@ -9,6 +9,11 @@ export type AppModule = {
   title: string;
   /** Emoji shown as the tab icon. */
   icon: string;
-  /** Runs once per app start, after database migrations. */
+  /**
+   * Prepares data the module's screens need (e.g. default rows). Runs after database migrations
+   * and the app waits for it before showing any screen, so keep it fast.
+   */
+  prepare?: () => Promise<void>;
+  /** Runs once per app start in the background, after `prepare` (e.g. asking for permissions). */
   onReady?: () => void | Promise<void>;
 };
