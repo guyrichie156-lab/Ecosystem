@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useAsyncData, useRefreshOnFocus } from "@ecosystem/core";
@@ -7,6 +7,8 @@ import { getLatestMeasurements, getMeasurementSeries, type LatestMeasurement } f
 import { getHealthProfile } from "../lib/profile";
 import { getHealthTips } from "../lib/tips";
 import { TipCard } from "../components/TipCard";
+import { HealthConnectCard } from "../components/HealthConnectCard";
+import { onHealthConnectImport } from "../lib/healthConnectSync";
 
 const dayFormat = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" });
 
@@ -41,6 +43,7 @@ export function HealthHomeScreen() {
     return { latest, profile, tips: getHealthTips({ latest, weightSeries, profile }) };
   }, []);
   useRefreshOnFocus(refresh);
+  useEffect(() => onHealthConnectImport(refresh), [refresh]);
 
   const latest = data?.latest ?? [];
   const byKind = new Map(latest.map((m) => [m.kind, m]));
@@ -83,6 +86,7 @@ export function HealthHomeScreen() {
               <Text style={styles.profileValue}>{profileSummary} ›</Text>
             </Pressable>
           </Link>
+          <HealthConnectCard onImported={refresh} />
           {/* Tips that need attention go above the zones; the rest follow them. */}
           {attentionTips.map((tip) => (
             <TipCard key={tip.id} tip={tip} onAction={openProfile} />

@@ -1,4 +1,4 @@
-import { SQLiteStorage } from "expo-sqlite/kv-store";
+import { settingsStorage as storage } from "./settingsStorage";
 
 export type Sex = "male" | "female";
 
@@ -8,8 +8,7 @@ export type HealthProfile = {
   sex: Sex | null;
 };
 
-// Two values don't need a table and a migration; a key-value store is enough.
-const storage = new SQLiteStorage("ecosystem-settings.db");
+// Two values don't need a table and a migration; the key-value settings store is enough.
 const HEIGHT_KEY = "health.heightMm";
 const SEX_KEY = "health.sex";
 

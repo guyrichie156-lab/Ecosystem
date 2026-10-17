@@ -5,8 +5,8 @@ export { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind };
 
 type KindInfo = {
   label: string;
-  unit: "кг" | "см";
-  /** Stored integer units per displayed unit: grams per kg, millimetres per cm. */
+  unit: "кг" | "см" | "%";
+  /** Stored integer units per displayed unit: grams per kg, tenths per percent, millimetres per cm. */
   scale: number;
   /** Plausible range in displayed units, to catch typos like 825 instead of 82,5. */
   min: number;
@@ -15,6 +15,7 @@ type KindInfo = {
 
 export const KIND_INFO: Record<BodyMeasurementKind, KindInfo> = {
   weight: { label: "Вес", unit: "кг", scale: 1000, min: 20, max: 400 },
+  bodyFat: { label: "Процент жира", unit: "%", scale: 10, min: 2, max: 75 },
   neck: { label: "Шея", unit: "см", scale: 10, min: 20, max: 80 },
   chest: { label: "Грудь", unit: "см", scale: 10, min: 50, max: 200 },
   waist: { label: "Талия", unit: "см", scale: 10, min: 40, max: 250 },

@@ -36,7 +36,8 @@
 Подробности: [[health-module]].
 
 ## Этап 3. «Здоровье» v2 — данные с устройств
-- ⬜ Android: Health Connect (вес, процент жира, сон, пульс, HRV).
+- 🔄 Android: Health Connect — импорт веса, процента жира и роста. Ветка `feature/health-connect` (от `feature/health-tips`); проверено в облаке всё, кроме работы на телефоне. Подробнее: [[health-module]].
+- ⬜ Android: сон, пульс, HRV из Health Connect — следующим шагом.
 - ⬜ iPhone: HealthKit. Нужна своя сборка (EAS Build) и платный аккаунт Apple Developer.
 Подробности: [[wearables-api]].
 

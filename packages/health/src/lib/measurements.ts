@@ -60,7 +60,12 @@ export async function getLatestMeasurements(): Promise<LatestMeasurement[]> {
 /** Every value of one zone, oldest first (the order a chart draws them). */
 export async function getMeasurementSeries(kind: BodyMeasurementKind) {
   return db
-    .select({ id: bodyMeasurements.id, value: bodyMeasurements.value, measuredAt: bodyMeasurements.measuredAt })
+    .select({
+      id: bodyMeasurements.id,
+      value: bodyMeasurements.value,
+      measuredAt: bodyMeasurements.measuredAt,
+      source: bodyMeasurements.source,
+    })
     .from(bodyMeasurements)
     .where(eq(bodyMeasurements.kind, kind))
     .orderBy(asc(bodyMeasurements.measuredAt), asc(bodyMeasurements.id));

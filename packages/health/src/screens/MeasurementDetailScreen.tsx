@@ -21,7 +21,10 @@ function EntryRow({
   const [confirming, setConfirming] = useState(false);
   return (
     <View style={styles.row}>
-      <Text style={styles.rowDate}>{dateFormat.format(new Date(point.measuredAt))}</Text>
+      <View style={styles.rowDate}>
+        <Text style={styles.rowDateText}>{dateFormat.format(new Date(point.measuredAt))}</Text>
+        {point.source === "health_connect" && <Text style={styles.rowSource}>из Health Connect</Text>}
+      </View>
       <Text style={styles.rowValue}>{formatMeasurement(kind, point.value)}</Text>
       {/* Two taps instead of a dialog: Alert has no buttons on web. */}
       <Pressable
@@ -107,7 +110,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#e5e5ea",
   },
-  rowDate: { flex: 1, fontSize: 15, color: "#1c1c1e" },
+  rowDate: { flex: 1 },
+  rowDateText: { fontSize: 15, color: "#1c1c1e" },
+  rowSource: { fontSize: 12, color: "#8a8a8e", marginTop: 2 },
   rowValue: { fontSize: 15, fontWeight: "600", color: "#1c1c1e", marginRight: 12 },
   deleteButton: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8, backgroundColor: "#f0f0f2" },
   deleteButtonConfirm: { backgroundColor: "#fdecea" },

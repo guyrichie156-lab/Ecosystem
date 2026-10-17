@@ -19,7 +19,12 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.health.READ_WEIGHT",
+        "android.permission.health.READ_BODY_FAT",
+        "android.permission.health.READ_HEIGHT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -56,7 +61,16 @@
           ]
         }
       ],
-      "./plugins/withAndroidWorkManagerFix"
+      "./plugins/withAndroidWorkManagerFix",
+      "react-native-health-connect",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ]
     ]
   }
 }

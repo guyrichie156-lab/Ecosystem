@@ -15,6 +15,7 @@
 На Android читать данные из Health Connect (одно хранилище для всех устройств).
 Библиотека: https://github.com/matinzd/react-native-health-connect (Expo, development build).
 Не проверено: какие приложения колец пишут данные в Health Connect.
+Сделано 2026-10-17: импорт веса, процента жира и роста (ветка `feature/health-connect`, см. [[health-module]]). Сон, пульс, HRV — следующим шагом.
 
 Health Connect есть только на Android. На iPhone аналог — Apple HealthKit, библиотека с плагином для Expo: https://classic.yarnpkg.com/en/package/@kingstinct/react-native-healthkit (в Expo Go не работает, нужен development build).
 

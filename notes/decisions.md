@@ -1,5 +1,13 @@
 # Журнал решений
 
+## 2026-10-17 (Health Connect)
+- Ветка `feature/health-connect` от `feature/health-tips` (импорт кладёт данные в модуль замеров).
+- Импорт из Health Connect: вес, процент жира (новая зона), рост; при запуске в фоне и по кнопке. Подробнее и источники — [[health-module]].
+- Библиотека `react-native-health-connect` 4.1.3 со встроенным плагином Expo; `expo-build-properties` поднимает `minSdkVersion` до 26 (Android 7.x больше не поддерживается).
+- Новые поля замеров: `source` (manual / health_connect) и уникальный `external_id`; миграция `0003_sour_triton.sql`.
+- Добавлена проверка типов Android-версий файлов: `pnpm typecheck` в `apps/mobile` (второй прогон с `moduleSuffixes`).
+- На телефоне после изменений в `app.json` нужен `npx expo prebuild --clean`: `expo run:android` пересоздаёт папку `android` только если её нет (`@expo/cli`, `run/ensureNativeProject.js`).
+
 ## 2026-10-17 (здоровье: подсказки)
 - Ветка `feature/health-tips` от `feature/health-measurements` (подсказки опираются на замеры).
 - Подсказки — правила по замерам пользователя, у каждой ссылка на источник; таблица правил и источников — в [[health-module]]. Подсказки — справочная информация, не медицинская консультация (так и написано в приложении).
