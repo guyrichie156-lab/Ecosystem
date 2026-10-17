@@ -10,3 +10,4 @@ export * from "./widget/widget-content";
 export * from "./widget/widget-task-handler";
 export * from "./widget/updateWidget";
 export * from "./seed";
+export * from "./module";

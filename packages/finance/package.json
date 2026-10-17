@@ -5,6 +5,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "dependencies": {
+    "@ecosystem/core": "workspace:*",
     "@ecosystem/db": "workspace:*",
     "drizzle-orm": "*",
     "expo-notifications": "*",

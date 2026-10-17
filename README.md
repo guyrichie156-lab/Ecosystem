@@ -25,6 +25,20 @@ cd apps/mobile
 pnpm android
 ```
 
+Так ставится отладочная версия: она берёт код с компьютера, поэтому компьютер должен быть включён.
+
+### APK, который работает сам по себе
+
+```bash
+cd apps/mobile
+pnpm android:release
+```
+
+Готовый файл: `apps/mobile/android/app/build/outputs/apk/release/app-release.apk`.
+Его можно скопировать на телефон и установить, компьютер больше не нужен.
+Он подписан отладочным ключом (так настроен шаблон Expo SDK 57): для своего телефона подходит,
+для Google Play нужен свой ключ.
+
 Виджет «Баланс» и уведомления работают только в Android-версии.
 
 На iPhone через Expo Go (компьютер и iPhone в одной Wi-Fi сети):
@@ -39,8 +53,9 @@ npx expo start --go
 
 ## Структура
 
-- `apps/mobile` — приложение (Expo SDK 57, expo-router)
-- `packages/finance` — счета, транзакции, бюджеты, Android-виджет
+- `apps/mobile` — приложение (Expo SDK 57, expo-router); `modules.ts` — список модулей
+- `packages/core` — каркас модулей: включение и выключение на лету, изоляция ошибок
+- `packages/finance` — модуль «Финансы»: счета, транзакции, бюджеты, Android-виджет
 - `packages/db` — схема и миграции SQLite (drizzle)
 - `patches/` — временный патч expo-sqlite для веба (исправлено в expo-sqlite 58.0.12, удалить при переходе на SDK 58)
 - `notes/` — заметки и решения проекта (можно открыть как хранилище Obsidian)
