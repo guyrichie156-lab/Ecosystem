@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Platform, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
 import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
-import { niceTicks } from "../lib/ticks";
+import { niceTicks } from "@ecosystem/core";
 
 // Single-series line chart. Colors: series = categorical slot 1 of the dataviz
 // reference palette (validated on the white surface), text and grid in neutral tokens.
