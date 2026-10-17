@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { parseMinorUnits } from "../lib/money";
-import { runPostTransactionChecks } from "../lib/notifications";
+import { runAfterTransactionChange } from "../lib/notifications";
 import {
   addTransaction,
   deleteTransaction,
@@ -12,7 +12,6 @@ import {
   updateTransaction,
   type TransactionType,
 } from "../lib/transactions";
-import { updateBalanceWidget } from "../widget/updateWidget";
 import { Chip } from "../components/Chip";
 
 function labelForType(t: TransactionType) {
@@ -55,6 +54,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Fill the form once the transaction being edited has loaded.
   const existing = data?.existing;
@@ -79,20 +79,28 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
     setCategoryId(null);
   }
 
+  function handleAccountChange(id: number) {
+    setAccountId(id);
+    // A transfer can't go to the account it comes from.
+    if (counterpartAccountId === id) setCounterpartAccountId(null);
+  }
+
   async function handleSave() {
+    // Shown under the form rather than in Alert, which does nothing on web.
     const amount = parseMinorUnits(amountText);
     if (!amount || amount <= 0) {
-      Alert.alert("Введите сумму", "Например: 1500 или 1500,50");
+      setError("Введите сумму, например 1500 или 1500,50.");
       return;
     }
     if (!accountId) {
-      Alert.alert("Выберите счёт");
+      setError("Выберите счёт.");
       return;
     }
-    if (type === "transfer" && !counterpartAccountId) {
-      Alert.alert("Выберите счёт получателя");
+    if (type === "transfer" && (!counterpartAccountId || counterpartAccountId === accountId)) {
+      setError("Выберите счёт получателя.");
       return;
     }
+    setError(null);
     const account = data?.accounts.find((a) => a.id === accountId);
     if (!account) return;
 
@@ -113,7 +121,10 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       } else {
         await addTransaction(input);
       }
-      await Promise.all([updateBalanceWidget(), runPostTransactionChecks()]);
+      await runAfterTransactionChange({
+        categoryId: type === "expense" ? categoryId : null,
+        accountIds: type === "transfer" ? [accountId, counterpartAccountId!] : [accountId],
+      });
       router.back();
     } finally {
       setSaving(false);
@@ -130,7 +141,8 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
     setSaving(true);
     try {
       await deleteTransaction(transactionId);
-      await updateBalanceWidget();
+      // Deleting only lowers spending or restores a balance, so there is nothing to alert about.
+      await runAfterTransactionChange({ categoryId: null, accountIds: [] });
       router.back();
     } finally {
       setSaving(false);
@@ -157,7 +169,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       <Text style={styles.sectionTitle}>Счёт</Text>
       <View style={styles.chipRow}>
         {(data?.accounts ?? []).map((a) => (
-          <Chip key={a.id} label={a.name} selected={accountId === a.id} onPress={() => setAccountId(a.id)} />
+          <Chip key={a.id} label={a.name} selected={accountId === a.id} onPress={() => handleAccountChange(a.id)} />
         ))}
       </View>
 
@@ -201,6 +213,8 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
 
       <Text style={styles.sectionTitle}>Заметка</Text>
       <TextInput style={styles.input} placeholder="Необязательно" value={note} onChangeText={setNote} />
+
+      {error && <Text style={styles.error}>{error}</Text>}
 
       <Pressable style={styles.saveButton} onPress={handleSave} disabled={saving}>
         <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Сохранить"}</Text>
@@ -248,4 +262,5 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: { color: "#c62828", fontWeight: "600", fontSize: 16 },
   missing: { padding: 20, fontSize: 15, color: "#8a8a8e" },
+  error: { color: "#c62828", fontSize: 14, marginTop: 16 },
 });
