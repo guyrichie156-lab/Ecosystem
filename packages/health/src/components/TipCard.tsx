@@ -1,10 +1,18 @@
 import React from "react";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import type { Tip } from "../lib/tips";
 
-export function TipCard({ tip, onAction }: { tip: Tip; onAction: (action: "profile") => void }) {
+export function TipCard({
+  tip,
+  onAction,
+  style,
+}: {
+  tip: Tip;
+  onAction: (action: "profile") => void;
+  style?: StyleProp<ViewStyle>;
+}) {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, style]}>
       {tip.attention && <Text style={styles.attention}>⚠️ Обратите внимание</Text>}
       <Text style={styles.title}>{tip.title}</Text>
       <Text style={styles.text}>{tip.text}</Text>

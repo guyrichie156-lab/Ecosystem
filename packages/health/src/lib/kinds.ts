@@ -3,6 +3,12 @@ import { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind } from "@ecosystem/db/
 
 export { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind };
 
+/**
+ * Zones the app asks for and shows: the MVP set the user chose on 2026-10-17. Only these take part in
+ * calculations (tips, Health Connect import). Rows of the other kinds stay in the database, unseen.
+ */
+export const ACTIVE_KINDS = ["weight", "bodyFat", "waist"] as const satisfies readonly BodyMeasurementKind[];
+
 type KindInfo = {
   label: string;
   unit: "кг" | "см" | "%";
@@ -11,19 +17,26 @@ type KindInfo = {
   /** Plausible range in displayed units, to catch typos like 825 instead of 82,5. */
   min: number;
   max: number;
+  /** Placeholder for the input. */
+  example: string;
 };
 
 export const KIND_INFO: Record<BodyMeasurementKind, KindInfo> = {
-  weight: { label: "Вес", unit: "кг", scale: 1000, min: 20, max: 400 },
-  bodyFat: { label: "Процент жира", unit: "%", scale: 10, min: 2, max: 75 },
-  neck: { label: "Шея", unit: "см", scale: 10, min: 20, max: 80 },
-  chest: { label: "Грудь", unit: "см", scale: 10, min: 50, max: 200 },
-  waist: { label: "Талия", unit: "см", scale: 10, min: 40, max: 250 },
-  belly: { label: "Живот", unit: "см", scale: 10, min: 40, max: 250 },
-  hips: { label: "Бёдра", unit: "см", scale: 10, min: 50, max: 250 },
-  biceps: { label: "Бицепс", unit: "см", scale: 10, min: 15, max: 80 },
-  thigh: { label: "Бедро", unit: "см", scale: 10, min: 30, max: 120 },
+  weight: { label: "Вес", unit: "кг", scale: 1000, min: 20, max: 400, example: "например, 82,5" },
+  bodyFat: { label: "Процент жира", unit: "%", scale: 10, min: 2, max: 75, example: "например, 18,5" },
+  neck: { label: "Шея", unit: "см", scale: 10, min: 20, max: 80, example: "например, 38" },
+  chest: { label: "Грудь", unit: "см", scale: 10, min: 50, max: 200, example: "например, 100" },
+  waist: { label: "Талия", unit: "см", scale: 10, min: 40, max: 250, example: "например, 84" },
+  belly: { label: "Живот", unit: "см", scale: 10, min: 40, max: 250, example: "например, 90" },
+  hips: { label: "Обхват бёдер", unit: "см", scale: 10, min: 50, max: 250, example: "например, 100" },
+  biceps: { label: "Бицепс", unit: "см", scale: 10, min: 15, max: 80, example: "например, 35" },
+  thigh: { label: "Обхват ноги", unit: "см", scale: 10, min: 30, max: 120, example: "например, 58" },
 };
+
+/** "Вес, кг" — the label with its unit, for inputs and headings. */
+export function labelWithUnit(kind: BodyMeasurementKind): string {
+  return `${KIND_INFO[kind].label}, ${KIND_INFO[kind].unit}`;
+}
 
 const numberFormat = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
