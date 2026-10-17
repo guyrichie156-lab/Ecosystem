@@ -16,6 +16,12 @@ Expo собирает настоящее Android-приложение (APK) и i
 Release-APK подписан отладочным ключом: так настроен шаблон Expo SDK 57 (`expo-template-bare-minimum` 57.0.32, `android/app/build.gradle`). Для своего телефона подходит, для Google Play нужен свой ключ.
 Ещё вариант — облачная сборка EAS Build с `"buildType": "apk"`: https://docs.expo.dev/build-reference/apk/
 
+### Сборка APK в облачной среде Claude (проверено 2026-10-17)
+Без настройки сети не получается. Где остановилась `./gradlew assembleDebug`:
+1. Плагину React Native нужна Java 17, в среде только 21; Gradle пытается скачать её с `api.foojay.io` — прокси отвечает 403. Обход: `apt-get install -y openjdk-17-jdk-headless` и `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64` (ставится заново в каждой новой сессии).
+2. Maven Central иногда отвечает 429 (слишком много запросов) — проходит при повторе с `--max-workers=2`.
+3. `dl.google.com` (хранилище Google: Android Gradle Plugin, Android SDK, NDK) — 403. Дальше без него никак: нужно добавить `dl.google.com` в разрешённые домены окружения (Network access → Allowed domains): https://code.claude.com/docs/en/cloud-environments#network-access . `www.jitpack.io` из списка репозиториев тоже закрыт.
+
 ## Модули
 Каждая функция — отдельный модуль. Это нужно для разработки: функцию можно менять в своей ветке Git, не трогая остальные.
 Выключателей модулей в приложении нет: их убрали 2026-10-17, пользователю они не нужны.
