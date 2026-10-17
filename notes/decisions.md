@@ -6,6 +6,9 @@
 - Maven Central (и Gradle Plugin Portal, который переадресует туда) отвечал 429. В облаке Gradle читает его через зеркало Google; init-скрипт лежит только в облачной среде, в проект не входит.
 - APK подписан отладочным ключом шаблона Expo. Android ставит обновление поверх, только если подпись та же: https://developer.android.com/studio/publish/app-signing («users can only update your app if the update is signed with the same signing key»). Если подписи разные, старую версию придётся удалить вместе с данными.
 - На телефоне приложение называется «mobile» (`expo.name` в `app.json`).
+- Готовые APK лежат в отдельной ветке `apk` без кода и без общей истории (orphan), чтобы файлы по 60+ МБ не попадали в историю кода. Git предупреждает о файлах больше 50 МиБ, GitHub не принимает больше 100 МиБ, для больших файлов советует Releases: https://github.com/github/docs/blob/main/content/repositories/working-with-files/managing-large-files/about-large-files-on-github.md . Позже заменить на Releases.
+- Репозиторий публичный: APK по ссылке может скачать любой. Секретов в нём нет: код и так открыт, ключ подписи — стандартный отладочный.
+- Прямая ссылка: https://github.com/guyrichie156-lab/Ecosystem/raw/apk/ecosystem-2026-10-17.apk (проверено: скачивается, SHA-256 совпадает).
 
 ## 2026-10-17 (Health Connect)
 - Ветка `feature/health-connect` от `feature/health-tips` (импорт кладёт данные в модуль замеров).
