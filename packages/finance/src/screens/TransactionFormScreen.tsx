@@ -1,47 +1,83 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 import { useRouter } from "expo-router";
-import {
-  db,
-  accounts as accountsTable,
-  categories as categoriesTable,
-  transactions as transactionsTable,
-} from "@ecosystem/db";
+import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { parseMinorUnits } from "../lib/money";
 import { runPostTransactionChecks } from "../lib/notifications";
+import {
+  addTransaction,
+  deleteTransaction,
+  getTransaction,
+  updateTransaction,
+  type TransactionType,
+} from "../lib/transactions";
 import { updateBalanceWidget } from "../widget/updateWidget";
 import { Chip } from "../components/Chip";
 
-type TxType = "income" | "expense" | "transfer";
-
-function labelForType(t: TxType) {
+function labelForType(t: TransactionType) {
   if (t === "income") return "Доход";
   if (t === "expense") return "Расход";
   return "Перевод";
 }
 
+/** Kopecks -> the text a user would type, e.g. 150050 -> "1500,50", 150000 -> "1500". */
+function minorUnitsToInput(minorUnits: number): string {
+  const major = minorUnits / 100;
+  return (Number.isInteger(major) ? String(major) : major.toFixed(2)).replace(".", ",");
+}
+
 export function AddTransactionScreen() {
+  return <TransactionForm />;
+}
+
+export function EditTransactionScreen({ transactionId }: { transactionId: number }) {
+  return <TransactionForm transactionId={transactionId} />;
+}
+
+function TransactionForm({ transactionId }: { transactionId?: number }) {
   const router = useRouter();
+  const isEdit = transactionId !== undefined;
   const { data } = useAsyncData(async () => {
-    const [accs, cats] = await Promise.all([
+    const [accs, cats, existing] = await Promise.all([
       db.select().from(accountsTable),
       db.select().from(categoriesTable),
+      isEdit ? getTransaction(transactionId) : Promise.resolve(undefined),
     ]);
-    return { accounts: accs, categories: cats };
-  }, []);
+    return { accounts: accs, categories: cats, existing };
+  }, [transactionId]);
 
-  const [type, setType] = useState<TxType>("expense");
+  const [type, setType] = useState<TransactionType>("expense");
   const [accountId, setAccountId] = useState<number | null>(null);
   const [counterpartAccountId, setCounterpartAccountId] = useState<number | null>(null);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [amountText, setAmountText] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  // Fill the form once the transaction being edited has loaded.
+  const existing = data?.existing;
+  useEffect(() => {
+    if (!existing) return;
+    setType(existing.type);
+    setAccountId(existing.accountId);
+    setCounterpartAccountId(existing.counterpartAccountId);
+    setCategoryId(existing.categoryId);
+    setAmountText(minorUnitsToInput(existing.amount));
+    setNote(existing.note ?? "");
+  }, [existing]);
 
   const filteredCategories = (data?.categories ?? []).filter(
     (c) => c.kind === (type === "income" ? "income" : "expense")
   );
+
+  function handleTypeChange(next: TransactionType) {
+    if (next === type) return;
+    setType(next);
+    // Income and expense have different categories, so the old choice no longer fits.
+    setCategoryId(null);
+  }
 
   async function handleSave() {
     const amount = parseMinorUnits(amountText);
@@ -60,18 +96,23 @@ export function AddTransactionScreen() {
     const account = data?.accounts.find((a) => a.id === accountId);
     if (!account) return;
 
+    const input = {
+      accountId,
+      type,
+      amount,
+      currency: account.currency,
+      categoryId: type === "transfer" ? null : categoryId,
+      counterpartAccountId: type === "transfer" ? counterpartAccountId : null,
+      note: note || null,
+    };
+
     setSaving(true);
     try {
-      await db.insert(transactionsTable).values({
-        accountId,
-        type,
-        amount,
-        currency: account.currency,
-        categoryId: type === "transfer" ? null : categoryId,
-        counterpartAccountId: type === "transfer" ? counterpartAccountId : null,
-        occurredAt: Date.now(),
-        note: note || null,
-      });
+      if (isEdit) {
+        await updateTransaction(transactionId, input);
+      } else {
+        await addTransaction(input);
+      }
       await Promise.all([updateBalanceWidget(), runPostTransactionChecks()]);
       router.back();
     } finally {
@@ -79,12 +120,37 @@ export function AddTransactionScreen() {
     }
   }
 
+  async function handleDelete() {
+    if (!isEdit) return;
+    // Two taps instead of a dialog: Alert has no buttons on web.
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    setSaving(true);
+    try {
+      await deleteTransaction(transactionId);
+      await updateBalanceWidget();
+      router.back();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (isEdit && data && !existing) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.missing}>Транзакция не найдена — возможно, она уже удалена.</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.sectionTitle}>Тип</Text>
       <View style={styles.chipRow}>
-        {(["expense", "income", "transfer"] as TxType[]).map((t) => (
-          <Chip key={t} label={labelForType(t)} selected={type === t} onPress={() => setType(t)} />
+        {(["expense", "income", "transfer"] as TransactionType[]).map((t) => (
+          <Chip key={t} label={labelForType(t)} selected={type === t} onPress={() => handleTypeChange(t)} />
         ))}
       </View>
 
@@ -139,6 +205,14 @@ export function AddTransactionScreen() {
       <Pressable style={styles.saveButton} onPress={handleSave} disabled={saving}>
         <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Сохранить"}</Text>
       </Pressable>
+
+      {isEdit && (
+        <Pressable style={styles.deleteButton} onPress={handleDelete} disabled={saving}>
+          <Text style={styles.deleteButtonText}>
+            {confirmingDelete ? "Нажмите ещё раз, чтобы удалить" : "Удалить транзакцию"}
+          </Text>
+        </Pressable>
+      )}
     </ScrollView>
   );
 }
@@ -165,4 +239,13 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
+  deleteButton: {
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    marginTop: 12,
+    backgroundColor: "#fdecea",
+  },
+  deleteButtonText: { color: "#c62828", fontWeight: "600", fontSize: 16 },
+  missing: { padding: 20, fontSize: 15, color: "#8a8a8e" },
 });

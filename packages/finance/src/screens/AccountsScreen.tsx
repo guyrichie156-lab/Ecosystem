@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
 import { db, accounts as accountsTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
+import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
 import { getAccountBalance } from "../lib/balance";
 import { formatMinorUnits, parseMinorUnits } from "../lib/money";
 import { Chip } from "../components/Chip";
@@ -20,6 +21,7 @@ export function AccountsScreen() {
     const accs = await db.select().from(accountsTable);
     return Promise.all(accs.map(async (a) => ({ ...a, balance: await getAccountBalance(a.id) })));
   }, []);
+  useRefreshOnFocus(refresh);
 
   const [name, setName] = useState("");
   const [type, setType] = useState<AccountType>("cash");
