@@ -24,11 +24,23 @@ export function BudgetsScreen() {
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [limitText, setLimitText] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
-    if (!categoryId) return;
+    if (!categoryId) {
+      setError("Выберите категорию.");
+      return;
+    }
+    if (data?.statuses.some((b) => b.categoryId === categoryId)) {
+      setError("Для этой категории бюджет уже есть.");
+      return;
+    }
     const limit = parseMinorUnits(limitText);
-    if (!limit || limit <= 0) return;
+    if (!limit || limit <= 0) {
+      setError("Лимит — число больше нуля, например 15 000.");
+      return;
+    }
+    setError(null);
     setSaving(true);
     try {
       await db.insert(budgetsTable).values({
@@ -91,6 +103,7 @@ export function BudgetsScreen() {
           value={limitText}
           onChangeText={setLimitText}
         />
+        {error && <Text style={styles.error}>{error}</Text>}
         <Pressable style={styles.saveButton} onPress={handleCreate} disabled={saving}>
           <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Добавить бюджет"}</Text>
         </Pressable>
@@ -125,4 +138,5 @@ const styles = StyleSheet.create({
   },
   saveButton: { backgroundColor: "#1c1c1e", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
   saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
+  error: { color: "#c62828", fontSize: 14, marginBottom: 10 },
 });

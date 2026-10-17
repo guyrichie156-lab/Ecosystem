@@ -16,7 +16,7 @@ Every feature is a separate module, so it can be changed on its own branch witho
 There are no user-facing on/off switches (the user decided against them on 2026-10-17).
 - A module is a package exporting an `AppModule` (`packages/core/src/types.ts`), listed in `apps/mobile/modules.ts`.
 - Its routes live in `apps/mobile/app/(tabs)/<module id>/`. The module's `_layout.tsx` exports `ErrorBoundary` rendering `ModuleErrorFallback`, so a crash stays inside the module.
-- Start-up work goes in `onReady`, never in the root layout.
+- Start-up work goes in the module, never in the root layout: data the screens need (default rows) in `prepare` (awaited before any screen shows, keep it fast), anything else in `onReady` (background).
 - Modules don't import each other; shared code goes to `packages/core` or `packages/db`.
 
 ## Git
