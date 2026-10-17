@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View, Pressable } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
+import { TextField } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
@@ -203,8 +204,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       )}
 
       <Text style={styles.sectionTitle}>Сумма</Text>
-      <TextInput
-        style={styles.input}
+      <TextField
         placeholder="0,00"
         keyboardType="decimal-pad"
         value={amountText}
@@ -212,7 +212,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       />
 
       <Text style={styles.sectionTitle}>Заметка</Text>
-      <TextInput style={styles.input} placeholder="Необязательно" value={note} onChangeText={setNote} />
+      <TextField placeholder="Необязательно" value={note} onChangeText={setNote} />
 
       {error && <Text style={styles.error}>{error}</Text>}
 
@@ -236,15 +236,6 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 40 },
   sectionTitle: { fontSize: 14, fontWeight: "600", color: "#1c1c1e", marginTop: 16, marginBottom: 8 },
   chipRow: { flexDirection: "row", flexWrap: "wrap" },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d1d1d6",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#1c1c1e",
-  },
   saveButton: {
     backgroundColor: "#1c1c1e",
     borderRadius: 12,

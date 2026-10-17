@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { TextField } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { getHealthProfile, saveHealthProfile, type Sex } from "../lib/profile";
 
@@ -37,8 +38,7 @@ export function HealthProfileScreen() {
         Рост нужен для отношения талии к росту, пол — для ориентиров по талии. Хранится только на этом устройстве.
       </Text>
       <Text style={styles.label}>Рост, см</Text>
-      <TextInput
-        style={styles.input}
+      <TextField
         placeholder="Например, 180"
         keyboardType="decimal-pad"
         value={heightText}
@@ -70,15 +70,6 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 40 },
   hint: { fontSize: 14, color: "#8a8a8e", marginBottom: 8 },
   label: { fontSize: 14, fontWeight: "600", color: "#1c1c1e", marginTop: 16, marginBottom: 8 },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d1d1d6",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#1c1c1e",
-  },
   chipRow: { flexDirection: "row", flexWrap: "wrap" },
   chip: {
     paddingVertical: 8,

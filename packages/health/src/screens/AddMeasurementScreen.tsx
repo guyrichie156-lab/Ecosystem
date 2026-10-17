@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { TextField } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { BODY_MEASUREMENT_KINDS, KIND_INFO, parseMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { addCheckIn } from "../lib/measurements";
@@ -41,7 +42,7 @@ export function AddMeasurementScreen() {
       {BODY_MEASUREMENT_KINDS.map((kind) => (
         <View key={kind} style={styles.row}>
           <Text style={styles.label}>{KIND_INFO[kind].label}</Text>
-          <TextInput
+          <TextField
             style={styles.input}
             placeholder={KIND_INFO[kind].unit}
             keyboardType="decimal-pad"
@@ -69,17 +70,7 @@ const styles = StyleSheet.create({
   hint: { fontSize: 14, color: "#8a8a8e", marginBottom: 12 },
   row: { flexDirection: "row", alignItems: "center", marginTop: 10 },
   label: { flex: 1, fontSize: 16, color: "#1c1c1e" },
-  input: {
-    width: 120,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d1d1d6",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: "#1c1c1e",
-    textAlign: "right",
-  },
+  input: { width: 120, textAlign: "right" },
   error: { color: "#c62828", fontSize: 14, marginTop: 12 },
   saveButton: {
     backgroundColor: "#1c1c1e",
