@@ -35,6 +35,8 @@ Release-APK подписан отладочным ключом: так наст�
 
 Эмулятор Android в облаке не запустить: нет `/dev/kvm` (аппаратного ускорения). `www.jitpack.io` закрыт, но сборке не понадобился.
 
+Проверка в браузере в облаке: dev-сервер, запущенный с `CI=1`, не следит за файлами — в его журнале «Metro is running in CI mode, reloads are disabled. Remove CI=true to enable watch mode.» После правки кода сервер нужно перезапустить (`--clear`).
+
 ```groovy
 // ~/.gradle/init.d/maven-central-mirror.gradle
 def mirror = "https://maven-central.storage-download.googleapis.com/maven2/"
