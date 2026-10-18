@@ -1,5 +1,6 @@
 import React from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { useThemedStyles, type Theme } from "@ecosystem/core";
 import { Link } from "expo-router";
 import { getAccountBalance, getActiveAccounts, getThisMonthSpend, getTotalBalance } from "../lib/balance";
 import { foldCategories } from "../lib/chartData";
@@ -13,6 +14,7 @@ import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
 const monthName = new Intl.DateTimeFormat("ru-RU", { month: "long" });
 
 export function FinanceHomeScreen() {
+  const styles = useThemedStyles(makeStyles);
   const { data, loading, refresh } = useAsyncData(async () => {
     const [total, spend, accounts, byCategory, monthly] = await Promise.all([
       getTotalBalance(),
@@ -102,38 +104,39 @@ export function FinanceHomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  content: { padding: 20, paddingBottom: 40 },
-  chartTitle: { marginTop: 28, marginBottom: 12 },
-  hero: { marginTop: 16, marginBottom: 20 },
-  label: { fontSize: 14, color: "#8a8a8e" },
-  balance: { fontSize: 36, fontWeight: "700", color: "#1c1c1e", marginTop: 4 },
-  subLabel: { fontSize: 14, color: "#8a8a8e", marginTop: 4 },
-  actions: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 24 },
-  actionButton: {
-    backgroundColor: "#1c1c1e",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-  },
-  actionButtonText: { color: "#ffffff", fontWeight: "600" },
-  actionButtonSecondary: {
-    backgroundColor: "#f0f0f2",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-  },
-  actionButtonSecondaryText: { color: "#1c1c1e", fontWeight: "600" },
-  sectionTitle: { fontSize: 16, fontWeight: "600", color: "#1c1c1e", marginBottom: 8 },
-  accountRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5ea",
-  },
-  accountName: { fontSize: 15, color: "#1c1c1e" },
-  accountBalance: { fontSize: 15, color: "#1c1c1e", fontWeight: "600" },
-  empty: { color: "#8a8a8e", fontSize: 14, paddingVertical: 12 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background },
+    content: { padding: 20, paddingBottom: 40 },
+    chartTitle: { marginTop: 28, marginBottom: 12 },
+    hero: { marginTop: 16, marginBottom: 20 },
+    label: { fontSize: 14, color: t.textMuted },
+    balance: { fontSize: 36, fontWeight: "700", color: t.text, marginTop: 4 },
+    subLabel: { fontSize: 14, color: t.textMuted, marginTop: 4 },
+    actions: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 24 },
+    actionButton: {
+      backgroundColor: t.primary,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+    },
+    actionButtonText: { color: t.onPrimary, fontWeight: "600" },
+    actionButtonSecondary: {
+      backgroundColor: t.fill,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+    },
+    actionButtonSecondaryText: { color: t.text, fontWeight: "600" },
+    sectionTitle: { fontSize: 16, fontWeight: "600", color: t.text, marginBottom: 8 },
+    accountRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: t.separator,
+    },
+    accountName: { fontSize: 15, color: t.text },
+    accountBalance: { fontSize: 15, color: t.text, fontWeight: "600" },
+    empty: { color: t.textMuted, fontSize: 14, paddingVertical: 12 },
+  });

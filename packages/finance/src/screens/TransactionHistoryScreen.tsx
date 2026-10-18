@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Pressable, RefreshControl, SectionList, StyleSheet, Text, View } from "react-native";
+import { useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
@@ -42,6 +43,7 @@ const TransactionRow = React.memo(function TransactionRow({
   item: TransactionHistoryItem;
   onPress: (id: number) => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   const subtitle = item.note ? `${item.accountName} · ${item.note}` : item.accountName;
   return (
     <Pressable style={styles.row} onPress={() => onPress(item.id)}>
@@ -61,6 +63,7 @@ const TransactionRow = React.memo(function TransactionRow({
 });
 
 export function TransactionHistoryScreen() {
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const { data, loading, refresh } = useAsyncData(getTransactionHistory, []);
   useRefreshOnFocus(refresh);
@@ -88,22 +91,23 @@ export function TransactionHistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  content: { paddingHorizontal: 20, paddingBottom: 40 },
-  sectionHeader: { fontSize: 13, fontWeight: "600", color: "#8a8a8e", marginTop: 20, marginBottom: 4 },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5ea",
-  },
-  rowText: { flex: 1, marginRight: 12 },
-  rowTitle: { fontSize: 15, color: "#1c1c1e" },
-  rowSubtitle: { fontSize: 13, color: "#8a8a8e", marginTop: 2 },
-  amount: { fontSize: 15, fontWeight: "600", color: "#1c1c1e" },
-  income: { color: "#2e7d32" },
-  expense: { color: "#c62828" },
-  empty: { color: "#8a8a8e", fontSize: 14, paddingVertical: 20 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background },
+    content: { paddingHorizontal: 20, paddingBottom: 40 },
+    sectionHeader: { fontSize: 13, fontWeight: "600", color: t.textMuted, marginTop: 20, marginBottom: 4 },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: t.separator,
+    },
+    rowText: { flex: 1, marginRight: 12 },
+    rowTitle: { fontSize: 15, color: t.text },
+    rowSubtitle: { fontSize: 13, color: t.textMuted, marginTop: 2 },
+    amount: { fontSize: 15, fontWeight: "600", color: t.text },
+    income: { color: t.income },
+    expense: { color: t.danger },
+    empty: { color: t.textMuted, fontSize: 14, paddingVertical: 20 },
+  });

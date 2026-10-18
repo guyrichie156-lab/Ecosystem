@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useAsyncData, useRefreshOnFocus } from "@ecosystem/core";
+import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { LineChart } from "../components/LineChart";
 import { KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { deleteMeasurement, getMeasurementSeries, type MeasurementPoint } from "../lib/measurements";
@@ -18,6 +18,7 @@ function EntryRow({
   point: MeasurementPoint;
   onDelete: (id: number) => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   const [confirming, setConfirming] = useState(false);
   return (
     <View style={styles.row}>
@@ -39,6 +40,7 @@ function EntryRow({
 }
 
 export function MeasurementDetailScreen({ kind }: { kind: BodyMeasurementKind }) {
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const info = KIND_INFO[kind];
   const { data, loading, refresh } = useAsyncData(() => getMeasurementSeries(kind), [kind]);
@@ -95,26 +97,27 @@ export function MeasurementDetailScreen({ kind }: { kind: BodyMeasurementKind })
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  content: { padding: 20, paddingBottom: 40 },
-  hero: { marginBottom: 12 },
-  heroValue: { fontSize: 34, fontWeight: "700", color: "#1c1c1e" },
-  heroCaption: { fontSize: 14, color: "#8a8a8e", marginTop: 4 },
-  note: { fontSize: 14, color: "#8a8a8e", marginVertical: 12 },
-  sectionTitle: { fontSize: 16, fontWeight: "600", color: "#1c1c1e", marginTop: 20, marginBottom: 4 },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5ea",
-  },
-  rowDate: { flex: 1 },
-  rowDateText: { fontSize: 15, color: "#1c1c1e" },
-  rowSource: { fontSize: 12, color: "#8a8a8e", marginTop: 2 },
-  rowValue: { fontSize: 15, fontWeight: "600", color: "#1c1c1e", marginRight: 12 },
-  deleteButton: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8, backgroundColor: "#f0f0f2" },
-  deleteButtonConfirm: { backgroundColor: "#fdecea" },
-  deleteText: { fontSize: 13, color: "#c62828", fontWeight: "600" },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background },
+    content: { padding: 20, paddingBottom: 40 },
+    hero: { marginBottom: 12 },
+    heroValue: { fontSize: 34, fontWeight: "700", color: t.text },
+    heroCaption: { fontSize: 14, color: t.textMuted, marginTop: 4 },
+    note: { fontSize: 14, color: t.textMuted, marginVertical: 12 },
+    sectionTitle: { fontSize: 16, fontWeight: "600", color: t.text, marginTop: 20, marginBottom: 4 },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: t.separator,
+    },
+    rowDate: { flex: 1 },
+    rowDateText: { fontSize: 15, color: t.text },
+    rowSource: { fontSize: 12, color: t.textMuted, marginTop: 2 },
+    rowValue: { fontSize: 15, fontWeight: "600", color: t.text, marginRight: 12 },
+    deleteButton: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8, backgroundColor: t.fill },
+    deleteButtonConfirm: { backgroundColor: t.dangerBg },
+    deleteText: { fontSize: 13, color: t.danger, fontWeight: "600" },
+  });

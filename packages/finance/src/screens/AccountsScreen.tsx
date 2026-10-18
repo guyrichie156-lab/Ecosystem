@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField } from "@ecosystem/core";
+import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
 import { db, accounts as accountsTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
@@ -18,6 +18,7 @@ function labelForAccountType(t: AccountType) {
 }
 
 export function AccountsScreen() {
+  const styles = useThemedStyles(makeStyles);
   const { data, loading, refresh } = useAsyncData(async () => {
     const accs = await db.select().from(accountsTable);
     return Promise.all(accs.map(async (a) => ({ ...a, balance: await getAccountBalance(a.id) })));
@@ -98,23 +99,24 @@ export function AccountsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff", padding: 20 },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5ea",
-  },
-  rowTitle: { fontSize: 15, color: "#1c1c1e" },
-  rowValue: { fontSize: 15, color: "#1c1c1e", fontWeight: "600" },
-  empty: { color: "#8a8a8e", fontSize: 14, paddingVertical: 12 },
-  form: { marginTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "#e5e5ea", paddingTop: 16 },
-  sectionTitle: { fontSize: 14, fontWeight: "600", color: "#1c1c1e", marginBottom: 8 },
-  chipRow: { flexDirection: "row", flexWrap: "wrap" },
-  field: { marginBottom: 10 },
-  saveButton: { backgroundColor: "#1c1c1e", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
-  saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
-  error: { color: "#c62828", fontSize: 14, marginBottom: 10 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background, padding: 20 },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: t.separator,
+    },
+    rowTitle: { fontSize: 15, color: t.text },
+    rowValue: { fontSize: 15, color: t.text, fontWeight: "600" },
+    empty: { color: t.textMuted, fontSize: 14, paddingVertical: 12 },
+    form: { marginTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: t.separator, paddingTop: 16 },
+    sectionTitle: { fontSize: 14, fontWeight: "600", color: t.text, marginBottom: 8 },
+    chipRow: { flexDirection: "row", flexWrap: "wrap" },
+    field: { marginBottom: 10 },
+    saveButton: { backgroundColor: t.primary, borderRadius: 12, paddingVertical: 14, alignItems: "center" },
+    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    error: { color: t.danger, fontSize: 14, marginBottom: 10 },
+  });

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { TextField } from "@ecosystem/core";
+import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { getHealthProfile, saveHealthProfile, type Sex } from "../lib/profile";
 
@@ -11,6 +11,7 @@ const SEX_OPTIONS: { value: Sex | null; label: string }[] = [
 ];
 
 export function HealthProfileScreen() {
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const initial = getHealthProfile();
   const [heightText, setHeightText] = useState(initial.heightMm ? String(initial.heightMm / 10) : "");
@@ -65,30 +66,31 @@ export function HealthProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  content: { padding: 20, paddingBottom: 40 },
-  hint: { fontSize: 14, color: "#8a8a8e", marginBottom: 8 },
-  label: { fontSize: 14, fontWeight: "600", color: "#1c1c1e", marginTop: 16, marginBottom: 8 },
-  chipRow: { flexDirection: "row", flexWrap: "wrap" },
-  chip: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    backgroundColor: "#f0f0f2",
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  chipSelected: { backgroundColor: "#1c1c1e" },
-  chipText: { fontSize: 14, color: "#1c1c1e" },
-  chipTextSelected: { color: "#ffffff" },
-  error: { color: "#c62828", fontSize: 14, marginTop: 12 },
-  saveButton: {
-    backgroundColor: "#1c1c1e",
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    marginTop: 28,
-  },
-  saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background },
+    content: { padding: 20, paddingBottom: 40 },
+    hint: { fontSize: 14, color: t.textMuted, marginBottom: 8 },
+    label: { fontSize: 14, fontWeight: "600", color: t.text, marginTop: 16, marginBottom: 8 },
+    chipRow: { flexDirection: "row", flexWrap: "wrap" },
+    chip: {
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      borderRadius: 20,
+      backgroundColor: t.fill,
+      marginRight: 8,
+      marginBottom: 8,
+    },
+    chipSelected: { backgroundColor: t.primary },
+    chipText: { fontSize: 14, color: t.text },
+    chipTextSelected: { color: t.onPrimary },
+    error: { color: t.danger, fontSize: 14, marginTop: 12 },
+    saveButton: {
+      backgroundColor: t.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+      marginTop: 28,
+    },
+    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+  });

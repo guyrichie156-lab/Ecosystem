@@ -1,24 +1,23 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View, type GestureResponderEvent } from "react-native";
+import { useTheme, useThemedStyles, type Theme } from "@ecosystem/core";
 import Svg, { Circle, Path } from "react-native-svg";
 import { formatMinorUnits } from "../lib/money";
 import { wholePercentages, type DonutSegment } from "../lib/chartData";
 
-// Categorical slots 1–5 of the dataviz reference palette, in their fixed order. Validated on the
-// white surface (scripts/validate_palette.js): worst adjacent CVD ΔE 9.1, normal vision 19.6; the
-// pair that closes the ring (slot 5 next to slot 1) gives 13.0 / 27.5. Slots 3–5 are below 3:1
-// against white, so every value is also written in the legend (the palette's relief rule).
-// Slots go by size within the month: there is no filter that could repaint a category.
-const SLOTS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"];
-const OTHER = "#aeaeb2"; // de-emphasis gray for the folded tail
-
+// Slice colours: categorical slots 1–5 of the dataviz reference palette for the current theme, in
+// their fixed order, and a gray for the folded tail (theme.chart; validation results in theme.ts).
+// In the light theme slots 3–5 are below 3:1 against the background, so every value is also
+// written in the legend (the palette's relief rule). Slots go by size within the month: there is
+// no filter that could repaint a category.
 const SIZE = 200;
 const RING = 26;
 const R = (SIZE - RING) / 2;
 const C = SIZE / 2;
 const GAP = 2; // px of surface between slices
 
-export const segmentColor = (segment: DonutSegment, index: number) => (segment.other ? OTHER : SLOTS[index]);
+export const segmentColor = (theme: Theme, segment: DonutSegment, index: number) =>
+  segment.other ? theme.chart.other : theme.chart.slots[index];
 
 function arc(start: number, end: number): string {
   const point = (a: number) => `${C + R * Math.sin(a)},${C - R * Math.cos(a)}`;
@@ -28,6 +27,8 @@ function arc(start: number, end: number): string {
 
 /** This month's expenses by category as a ring; the legend under it is the table of every value. */
 export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]; monthName: string }) {
+  const styles = useThemedStyles(makeStyles);
+  const theme = useTheme();
   const [selected, setSelected] = useState<number | null>(null);
   const total = segments.reduce((sum, s) => sum + s.amount, 0);
   const percents = wholePercentages(segments.map((s) => s.amount));
@@ -66,13 +67,13 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
       >
         <Svg width={SIZE} height={SIZE}>
           {segments.length === 1 ? (
-            <Circle cx={C} cy={C} r={R} stroke={segmentColor(segments[0], 0)} strokeWidth={RING} fill="none" />
+            <Circle cx={C} cy={C} r={R} stroke={segmentColor(theme, segments[0], 0)} strokeWidth={RING} fill="none" />
           ) : (
             slices.map((s, i) => (
               <Path
                 key={i}
                 d={arc(s.start, s.end)}
-                stroke={segmentColor(segments[i], i)}
+                stroke={segmentColor(theme, segments[i], i)}
                 strokeWidth={RING}
                 fill="none"
                 opacity={selected === null || selected === i ? 1 : 0.3}
@@ -100,7 +101,7 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
           accessibilityRole="button"
           accessibilityLabel={`${s.name}: ${formatMinorUnits(s.amount)}, ${percents[i]} %`}
         >
-          <View style={[styles.swatch, { backgroundColor: segmentColor(s, i) }]} />
+          <View style={[styles.swatch, { backgroundColor: segmentColor(theme, s, i) }]} />
           <Text style={styles.name} numberOfLines={1}>
             {s.name}
           </Text>
@@ -112,23 +113,24 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
   );
 }
 
-const styles = StyleSheet.create({
-  ring: { width: SIZE, height: SIZE, alignSelf: "center", marginBottom: 12 },
-  center: {
-    position: "absolute",
-    top: RING + 14,
-    bottom: RING + 14,
-    left: RING + 14,
-    right: RING + 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  centerBig: { fontSize: 18, fontWeight: "700", color: "#1c1c1e" },
-  centerSmall: { fontSize: 13, color: "#6e6e73", marginTop: 2, textAlign: "center" },
-  row: { flexDirection: "row", alignItems: "center", paddingVertical: 9, paddingHorizontal: 6, borderRadius: 8 },
-  rowSelected: { backgroundColor: "#f0f0f2" },
-  swatch: { width: 12, height: 12, borderRadius: 3, marginRight: 10 },
-  name: { flex: 1, fontSize: 15, color: "#1c1c1e" },
-  amount: { fontSize: 15, color: "#1c1c1e", fontWeight: "600" },
-  percent: { width: 52, fontSize: 14, color: "#6e6e73", textAlign: "right" },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    ring: { width: SIZE, height: SIZE, alignSelf: "center", marginBottom: 12 },
+    center: {
+      position: "absolute",
+      top: RING + 14,
+      bottom: RING + 14,
+      left: RING + 14,
+      right: RING + 14,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    centerBig: { fontSize: 18, fontWeight: "700", color: t.text },
+    centerSmall: { fontSize: 13, color: t.textMuted, marginTop: 2, textAlign: "center" },
+    row: { flexDirection: "row", alignItems: "center", paddingVertical: 9, paddingHorizontal: 6, borderRadius: 8 },
+    rowSelected: { backgroundColor: t.fill },
+    swatch: { width: 12, height: 12, borderRadius: 3, marginRight: 10 },
+    name: { flex: 1, fontSize: 15, color: t.text },
+    amount: { fontSize: 15, color: t.text, fontWeight: "600" },
+    percent: { width: 52, fontSize: 14, color: t.textMuted, textAlign: "right" },
+  });

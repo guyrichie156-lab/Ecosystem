@@ -1,10 +1,12 @@
 import React, { useRef, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useThemedStyles, type Theme } from "@ecosystem/core";
 import type { Tip } from "../lib/tips";
 import { TipCard } from "./TipCard";
 
 /** Tips one card at a time: swipe sideways, or tap a dot. Attention tips come first (getHealthTips orders them). */
 export function TipCarousel({ tips, onAction }: { tips: Tip[]; onAction: (action: "profile") => void }) {
+  const styles = useThemedStyles(makeStyles);
   const [width, setWidth] = useState(0);
   const [index, setIndex] = useState(0);
   const list = useRef<FlatList<Tip>>(null);
@@ -58,13 +60,14 @@ export function TipCarousel({ tips, onAction }: { tips: Tip[]; onAction: (action
   );
 }
 
-const styles = StyleSheet.create({
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 },
-  title: { fontSize: 16, fontWeight: "600", color: "#1c1c1e" },
-  counter: { fontSize: 13, color: "#6e6e73" },
-  // Cards stretch to the tallest one, so the dots don't jump while swiping.
-  card: { flex: 1, marginBottom: 0 },
-  dots: { flexDirection: "row", justifyContent: "center", gap: 10, marginTop: 10 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#c7c7cc" },
-  dotActive: { backgroundColor: "#1c1c1e" },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    header: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 },
+    title: { fontSize: 16, fontWeight: "600", color: t.text },
+    counter: { fontSize: 13, color: t.textMuted },
+    // Cards stretch to the tallest one, so the dots don't jump while swiping.
+    card: { flex: 1, marginBottom: 0 },
+    dots: { flexDirection: "row", justifyContent: "center", gap: 10, marginTop: 10 },
+    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: t.border },
+    dotActive: { backgroundColor: t.primary },
+  });

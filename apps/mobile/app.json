@@ -6,7 +6,7 @@
     "scheme": "ecosystem",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ecosystem.mobile"
@@ -31,6 +31,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-system-ui",
       "expo-sqlite",
       "expo-sharing",
       [

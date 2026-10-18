@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useAsyncData, useRefreshOnFocus } from "@ecosystem/core";
+import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { ACTIVE_KINDS, KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { getLatestMeasurements, getMeasurementSeries, type LatestMeasurement } from "../lib/measurements";
 import { getHealthProfile } from "../lib/profile";
@@ -21,6 +21,7 @@ function ZoneRow({
   latest: LatestMeasurement | undefined;
   onPress: (kind: BodyMeasurementKind) => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   const change = latest && latest.previous !== null ? latest.value - latest.previous : null;
   return (
     <Pressable style={styles.row} onPress={() => onPress(kind)} disabled={!latest}>
@@ -36,6 +37,7 @@ function ZoneRow({
 }
 
 export function HealthHomeScreen() {
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const { data, loading, refresh } = useAsyncData(async () => {
     const [latest, weightSeries] = await Promise.all([getLatestMeasurements(), getMeasurementSeries("weight")]);
@@ -109,45 +111,46 @@ export function HealthHomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  content: { padding: 20, paddingBottom: 40 },
-  subtitle: { fontSize: 14, color: "#8a8a8e", marginTop: 8 },
-  addButton: {
-    backgroundColor: "#1c1c1e",
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    marginTop: 16,
-    marginBottom: 12,
-  },
-  addButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
-  profileRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    marginBottom: 16,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: "#e5e5ea",
-  },
-  profileLabel: { fontSize: 15, color: "#1c1c1e" },
-  profileValue: { fontSize: 15, color: "#8a8a8e" },
-  disclaimer: { fontSize: 12, color: "#8a8a8e", marginTop: 10 },
-  tips: { marginTop: 24 },
-  sectionTitle: { fontSize: 16, fontWeight: "600", color: "#1c1c1e", marginBottom: 8 },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5ea",
-  },
-  rowLabel: { fontSize: 15, color: "#1c1c1e" },
-  rowRight: { alignItems: "flex-end" },
-  rowValue: { fontSize: 15, fontWeight: "600", color: "#1c1c1e" },
-  rowEmpty: { fontSize: 15, color: "#c7c7cc" },
-  rowChange: { fontSize: 12, color: "#8a8a8e", marginTop: 2 },
-  hint: { fontSize: 13, color: "#8a8a8e", marginTop: 16 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background },
+    content: { padding: 20, paddingBottom: 40 },
+    subtitle: { fontSize: 14, color: t.textMuted, marginTop: 8 },
+    addButton: {
+      backgroundColor: t.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+      marginTop: 16,
+      marginBottom: 12,
+    },
+    addButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    profileRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 12,
+      marginBottom: 16,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderColor: t.separator,
+    },
+    profileLabel: { fontSize: 15, color: t.text },
+    profileValue: { fontSize: 15, color: t.textMuted },
+    disclaimer: { fontSize: 12, color: t.textMuted, marginTop: 10 },
+    tips: { marginTop: 24 },
+    sectionTitle: { fontSize: 16, fontWeight: "600", color: t.text, marginBottom: 8 },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: t.separator,
+    },
+    rowLabel: { fontSize: 15, color: t.text },
+    rowRight: { alignItems: "flex-end" },
+    rowValue: { fontSize: 15, fontWeight: "600", color: t.text },
+    rowEmpty: { fontSize: 15, color: t.textMuted },
+    rowChange: { fontSize: 12, color: t.textMuted, marginTop: 2 },
+    hint: { fontSize: 13, color: t.textMuted, marginTop: 16 },
+  });

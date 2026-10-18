@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
-import { TextField } from "@ecosystem/core";
+import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
 import { useAsyncData } from "../hooks/useAsyncData";
@@ -36,6 +36,7 @@ export function EditTransactionScreen({ transactionId }: { transactionId: number
 }
 
 function TransactionForm({ transactionId }: { transactionId?: number }) {
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const isEdit = transactionId !== undefined;
   const { data } = useAsyncData(async () => {
@@ -231,27 +232,28 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  content: { padding: 20, paddingBottom: 40 },
-  sectionTitle: { fontSize: 14, fontWeight: "600", color: "#1c1c1e", marginTop: 16, marginBottom: 8 },
-  chipRow: { flexDirection: "row", flexWrap: "wrap" },
-  saveButton: {
-    backgroundColor: "#1c1c1e",
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    marginTop: 28,
-  },
-  saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
-  deleteButton: {
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    marginTop: 12,
-    backgroundColor: "#fdecea",
-  },
-  deleteButtonText: { color: "#c62828", fontWeight: "600", fontSize: 16 },
-  missing: { padding: 20, fontSize: 15, color: "#8a8a8e" },
-  error: { color: "#c62828", fontSize: 14, marginTop: 16 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background },
+    content: { padding: 20, paddingBottom: 40 },
+    sectionTitle: { fontSize: 14, fontWeight: "600", color: t.text, marginTop: 16, marginBottom: 8 },
+    chipRow: { flexDirection: "row", flexWrap: "wrap" },
+    saveButton: {
+      backgroundColor: t.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+      marginTop: 28,
+    },
+    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    deleteButton: {
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+      marginTop: 12,
+      backgroundColor: t.dangerBg,
+    },
+    deleteButtonText: { color: t.danger, fontWeight: "600", fontSize: 16 },
+    missing: { padding: 20, fontSize: 15, color: t.textMuted },
+    error: { color: t.danger, fontSize: 14, marginTop: 16 },
+  });

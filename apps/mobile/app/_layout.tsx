@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { Stack } from "expo-router";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useTheme, type Theme } from "@ecosystem/core";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { db, migrations } from "@ecosystem/db";
 import { appModules } from "../modules";
@@ -18,7 +20,27 @@ async function runForEachModule(step: "prepare" | "onReady") {
   );
 }
 
+/** Headers and the tab bar take their colours from the navigation theme. */
+function navigationTheme(t: Theme) {
+  const base = t.dark ? DarkTheme : DefaultTheme;
+  return {
+    ...base,
+    colors: { ...base.colors, primary: t.link, background: t.background, card: t.background, text: t.text, border: t.separator, notification: t.danger },
+  };
+}
+
 export default function RootLayout() {
+  const theme = useTheme();
+  const navTheme = useMemo(() => navigationTheme(theme), [theme]);
+  return (
+    <ThemeProvider value={navTheme}>
+      <StatusBar style="auto" />
+      <AppContent theme={theme} />
+    </ThemeProvider>
+  );
+}
+
+function AppContent({ theme }: { theme: Theme }) {
   const { success, error } = useMigrations(db, migrations);
   const [prepared, setPrepared] = useState(false);
 
@@ -33,16 +55,16 @@ export default function RootLayout() {
 
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text>Ошибка миграции базы данных: {error.message}</Text>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
+        <Text style={{ color: theme.text }}>Ошибка миграции базы данных: {error.message}</Text>
       </View>
     );
   }
 
   if (!success || !prepared) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator />
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
+        <ActivityIndicator color={theme.textMuted} />
       </View>
     );
   }

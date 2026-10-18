@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { TextField } from "@ecosystem/core";
+import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { ACTIVE_KINDS, KIND_INFO, labelWithUnit, parseMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { addCheckIn } from "../lib/measurements";
 
 export function AddMeasurementScreen() {
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const [inputs, setInputs] = useState<Partial<Record<BodyMeasurementKind, string>>>({});
   const [errors, setErrors] = useState<string[]>([]);
@@ -63,19 +64,20 @@ export function AddMeasurementScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  content: { padding: 20, paddingBottom: 40 },
-  hint: { fontSize: 14, color: "#8a8a8e", marginBottom: 12 },
-  field: { marginTop: 14 },
-  label: { fontSize: 15, fontWeight: "600", color: "#1c1c1e", marginBottom: 6 },
-  error: { color: "#c62828", fontSize: 14, marginTop: 12 },
-  saveButton: {
-    backgroundColor: "#1c1c1e",
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    marginTop: 28,
-  },
-  saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background },
+    content: { padding: 20, paddingBottom: 40 },
+    hint: { fontSize: 14, color: t.textMuted, marginBottom: 12 },
+    field: { marginTop: 14 },
+    label: { fontSize: 15, fontWeight: "600", color: t.text, marginBottom: 6 },
+    error: { color: t.danger, fontSize: 14, marginTop: 12 },
+    saveButton: {
+      backgroundColor: t.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+      marginTop: 28,
+    },
+    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+  });

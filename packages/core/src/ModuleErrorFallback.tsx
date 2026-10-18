@@ -2,12 +2,14 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { ErrorBoundaryProps } from "expo-router";
 import type { AppModule } from "./types";
+import { useThemedStyles, type Theme } from "./theme";
 
 /**
  * Re-export from a module's root `_layout.tsx` as `ErrorBoundary`: a crash inside the module
  * replaces only that module's screens, the rest of the app keeps working.
  */
 export function ModuleErrorFallback({ module, error, retry }: ErrorBoundaryProps & { module: AppModule }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.center}>
       <Text style={styles.title}>
@@ -24,18 +26,19 @@ export function ModuleErrorFallback({ module, error, retry }: ErrorBoundaryProps
   );
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#fff" },
-  title: { fontSize: 22, fontWeight: "700", marginBottom: 12, color: "#1c1c1e" },
-  text: { fontSize: 16, color: "#3a3a3c", textAlign: "center", marginBottom: 12 },
-  error: { fontSize: 13, color: "#8e8e93", textAlign: "center", marginBottom: 20 },
-  button: {
-    backgroundColor: "#1c1c1e",
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    minWidth: 240,
-    alignItems: "center",
-  },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: t.background },
+    title: { fontSize: 22, fontWeight: "700", marginBottom: 12, color: t.text },
+    text: { fontSize: 16, color: t.textSecondary, textAlign: "center", marginBottom: 12 },
+    error: { fontSize: 13, color: t.textMuted, textAlign: "center", marginBottom: 20 },
+    button: {
+      backgroundColor: t.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      minWidth: 240,
+      alignItems: "center",
+    },
+    buttonText: { color: t.onPrimary, fontSize: 16, fontWeight: "600" },
+  });

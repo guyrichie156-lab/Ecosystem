@@ -1,18 +1,13 @@
 import React, { useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
 import Svg, { Line, Path, Text as SvgText } from "react-native-svg";
-import { niceTicks } from "@ecosystem/core";
+import { niceTicks, useTheme, useThemedStyles, type Theme } from "@ecosystem/core";
 import { formatMinorUnits } from "../lib/money";
 import type { MonthSpend } from "../lib/chartData";
 
-// One series, so one hue: the selected month in categorical slot 1, the rest in the lightest step
-// of the same blue ramp the palette allows for discrete marks (step 250, 2.06:1 on white).
+// One series, so one hue: the selected month in categorical slot 1, the rest in the blue-ramp step
+// the palette allows for discrete marks in this theme (theme.chart.selected / theme.chart.rest).
 // Values never depend on the color: the caption names the selected month and the table lists all.
-const SELECTED = "#2a78d6";
-const REST = "#86b6ef";
-const GRID = "#e5e5ea";
-const BASELINE = "#c7c7cc";
-const TEXT_MUTED = "#6e6e73";
 
 // SVG text falls back to a serif font in browsers; use the system UI font there.
 const FONT = Platform.OS === "web" ? "system-ui, sans-serif" : undefined;
@@ -39,6 +34,8 @@ function column(x: number, w: number, top: number, bottom: number): string {
 
 /** Expenses per month, oldest first; tap a column to read it. */
 export function MonthlyBars({ months }: { months: MonthSpend[] }) {
+  const styles = useThemedStyles(makeStyles);
+  const theme = useTheme();
   const [width, setWidth] = useState(0);
   const [selected, setSelected] = useState(months.length - 1);
   const [showTable, setShowTable] = useState(false);
@@ -76,8 +73,8 @@ export function MonthlyBars({ months }: { months: MonthSpend[] }) {
           <Svg width={width} height={HEIGHT}>
             {ticks.map((t) => (
               <React.Fragment key={t}>
-                <Line x1={PAD.left} x2={width - PAD.right} y1={sy(t)} y2={sy(t)} stroke={t === 0 ? BASELINE : GRID} strokeWidth={1} />
-                <SvgText x={PAD.left - 8} y={sy(t) + 4} fontSize={11} fontFamily={FONT} fill={TEXT_MUTED} textAnchor="end">
+                <Line x1={PAD.left} x2={width - PAD.right} y1={sy(t)} y2={sy(t)} stroke={t === 0 ? theme.chart.baseline : theme.chart.grid} strokeWidth={1} />
+                <SvgText x={PAD.left - 8} y={sy(t) + 4} fontSize={11} fontFamily={FONT} fill={theme.textMuted} textAnchor="end">
                   {formatTick(t)}
                 </SvgText>
               </React.Fragment>
@@ -88,14 +85,14 @@ export function MonthlyBars({ months }: { months: MonthSpend[] }) {
               return (
                 <React.Fragment key={m.monthStart}>
                   {m.amount > 0 && (
-                    <Path d={column(x, barW, top, bottom)} fill={i === selected ? SELECTED : REST} />
+                    <Path d={column(x, barW, top, bottom)} fill={i === selected ? theme.chart.selected : theme.chart.rest} />
                   )}
                   <SvgText
                     x={x + barW / 2}
                     y={HEIGHT - 6}
                     fontSize={11}
                     fontFamily={FONT}
-                    fill={TEXT_MUTED}
+                    fill={theme.textMuted}
                     fontWeight={i === selected ? "700" : "400"}
                     textAnchor="middle"
                   >
@@ -123,18 +120,19 @@ export function MonthlyBars({ months }: { months: MonthSpend[] }) {
   );
 }
 
-const styles = StyleSheet.create({
-  caption: { fontSize: 14, color: "#6e6e73", marginBottom: 6 },
-  captionValue: { color: "#1c1c1e", fontWeight: "600" },
-  // 6.08:1 on white, the same link blue as elsewhere in the app.
-  toggle: { fontSize: 14, color: "#1f62b3", marginTop: 8, paddingVertical: 4 },
-  tableRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5ea",
-  },
-  tableMonth: { fontSize: 15, color: "#1c1c1e" },
-  tableValue: { fontSize: 15, color: "#1c1c1e", fontWeight: "600", fontVariant: ["tabular-nums"] },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    caption: { fontSize: 14, color: t.textMuted, marginBottom: 6 },
+    captionValue: { color: t.text, fontWeight: "600" },
+    // The link colour: at least 6:1 on the background in both themes (theme.ts).
+    toggle: { fontSize: 14, color: t.link, marginTop: 8, paddingVertical: 4 },
+    tableRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 8,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: t.separator,
+    },
+    tableMonth: { fontSize: 15, color: t.text },
+    tableValue: { fontSize: 15, color: t.text, fontWeight: "600", fontVariant: ["tabular-nums"] },
+  });

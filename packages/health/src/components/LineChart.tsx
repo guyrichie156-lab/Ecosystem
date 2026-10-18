@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import { Platform, StyleSheet, View, type GestureResponderEvent, type LayoutChangeEvent } from "react-native";
 import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
-import { niceTicks } from "@ecosystem/core";
+import { niceTicks, useTheme } from "@ecosystem/core";
 
-// Single-series line chart. Colors: series = categorical slot 1 of the dataviz
-// reference palette (validated on the white surface), text and grid in neutral tokens.
-const SERIES = "#2a78d6";
-const SURFACE = "#ffffff";
-const GRID = "#e5e5ea";
-const TEXT_MUTED = "#8a8a8e";
+// Single-series line chart. Series colour = categorical slot 1 of the dataviz reference palette
+// for the current theme (theme.chart.selected); text and grid in neutral theme tokens.
 
 // SVG text falls back to a serif font in browsers; use the system UI font there.
 const FONT = Platform.OS === "web" ? "system-ui, sans-serif" : undefined;
@@ -39,6 +35,8 @@ export function LineChart({
 }) {
   const [width, setWidth] = useState(0);
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
+  const theme = useTheme();
+  const SERIES = theme.chart.selected;
 
   const ys = points.map((p) => p.y);
   const ticks = niceTicks(Math.min(...ys), Math.max(...ys), minTickStep);
@@ -75,17 +73,17 @@ export function LineChart({
         <Svg width={width} height={HEIGHT}>
           {ticks.map((t) => (
             <React.Fragment key={t}>
-              <Line x1={PAD.left} x2={width - PAD.right} y1={sy(t)} y2={sy(t)} stroke={GRID} strokeWidth={1} />
-              <SvgText x={PAD.left - 8} y={sy(t) + 4} fontSize={11} fontFamily={FONT} fill={TEXT_MUTED} textAnchor="end">
+              <Line x1={PAD.left} x2={width - PAD.right} y1={sy(t)} y2={sy(t)} stroke={theme.chart.grid} strokeWidth={1} />
+              <SvgText x={PAD.left - 8} y={sy(t) + 4} fontSize={11} fontFamily={FONT} fill={theme.textMuted} textAnchor="end">
                 {formatTick(t)}
               </SvgText>
             </React.Fragment>
           ))}
-          <SvgText x={sx(xMin)} y={HEIGHT - 6} fontSize={11} fontFamily={FONT} fill={TEXT_MUTED} textAnchor="start">
+          <SvgText x={sx(xMin)} y={HEIGHT - 6} fontSize={11} fontFamily={FONT} fill={theme.textMuted} textAnchor="start">
             {shortDate.format(new Date(xMin))}
           </SvgText>
           {xMax !== xMin && (
-            <SvgText x={sx(xMax)} y={HEIGHT - 6} fontSize={11} fontFamily={FONT} fill={TEXT_MUTED} textAnchor="end">
+            <SvgText x={sx(xMax)} y={HEIGHT - 6} fontSize={11} fontFamily={FONT} fill={theme.textMuted} textAnchor="end">
               {shortDate.format(new Date(xMax))}
             </SvgText>
           )}
@@ -97,7 +95,7 @@ export function LineChart({
               cy={sy(p.y)}
               r={i === selectedIndex ? 6 : 4}
               fill={SERIES}
-              stroke={SURFACE}
+              stroke={theme.background}
               strokeWidth={2}
             />
           ))}

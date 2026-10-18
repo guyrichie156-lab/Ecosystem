@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { useAsyncData, useRefreshOnFocus } from "@ecosystem/core";
+import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { getHealthConnectStatus, openHealthConnectInStore, requestHealthConnectAccess } from "../lib/healthConnect";
 import { getLastHealthConnectImport, importFromHealthConnect } from "../lib/healthConnectSync";
 
@@ -8,6 +8,7 @@ const timeFormat = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "sh
 
 /** Connects Health Connect and imports from it. Renders nothing where Health Connect doesn't exist. */
 export function HealthConnectCard({ onImported }: { onImported: () => void }) {
+  const styles = useThemedStyles(makeStyles);
   const { data: status, refresh } = useAsyncData(getHealthConnectStatus, []);
   // Permissions can change in the Health Connect app while this screen is in the background.
   useRefreshOnFocus(refresh);
@@ -76,19 +77,20 @@ export function HealthConnectCard({ onImported }: { onImported: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: "#f5f5f7", borderRadius: 12, padding: 14, marginBottom: 16 },
-  title: { fontSize: 15, fontWeight: "600", color: "#1c1c1e" },
-  text: { fontSize: 14, color: "#3a3a3c", marginTop: 4, lineHeight: 20 },
-  message: { fontSize: 13, color: "#3a3a3c", marginTop: 6 },
-  button: {
-    alignSelf: "flex-start",
-    backgroundColor: "#1c1c1e",
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    marginTop: 10,
-  },
-  buttonBusy: { opacity: 0.6 },
-  buttonText: { color: "#ffffff", fontWeight: "600", fontSize: 14 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    card: { backgroundColor: t.card, borderRadius: 12, padding: 14, marginBottom: 16 },
+    title: { fontSize: 15, fontWeight: "600", color: t.text },
+    text: { fontSize: 14, color: t.textSecondary, marginTop: 4, lineHeight: 20 },
+    message: { fontSize: 13, color: t.textSecondary, marginTop: 6 },
+    button: {
+      alignSelf: "flex-start",
+      backgroundColor: t.primary,
+      borderRadius: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      marginTop: 10,
+    },
+    buttonBusy: { opacity: 0.6 },
+    buttonText: { color: t.onPrimary, fontWeight: "600", fontSize: 14 },
+  });

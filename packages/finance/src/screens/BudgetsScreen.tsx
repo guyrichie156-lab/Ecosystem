@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField } from "@ecosystem/core";
+import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
 import { db, budgets as budgetsTable, categories as categoriesTable } from "@ecosystem/db";
 import { eq } from "drizzle-orm";
 import { useAsyncData } from "../hooks/useAsyncData";
@@ -14,6 +14,7 @@ function currentMonth(): string {
 }
 
 export function BudgetsScreen() {
+  const styles = useThemedStyles(makeStyles);
   const { data, loading, refresh } = useAsyncData(async () => {
     const [statuses, expenseCategories] = await Promise.all([
       getBudgetStatuses(),
@@ -113,22 +114,23 @@ export function BudgetsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff", padding: 20 },
-  row: { paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: "#e5e5ea" },
-  rowHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
-  rowTitle: { fontSize: 15, color: "#1c1c1e" },
-  rowValue: { fontSize: 13, color: "#8a8a8e" },
-  rowValueOver: { color: "#d70015" },
-  progressTrack: { height: 6, borderRadius: 3, backgroundColor: "#f0f0f2", overflow: "hidden" },
-  progressFill: { height: "100%", backgroundColor: "#1c1c1e" },
-  progressFillOver: { backgroundColor: "#d70015" },
-  empty: { color: "#8a8a8e", fontSize: 14, paddingVertical: 12 },
-  form: { marginTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "#e5e5ea", paddingTop: 16 },
-  sectionTitle: { fontSize: 14, fontWeight: "600", color: "#1c1c1e", marginBottom: 8 },
-  chipRow: { flexDirection: "row", flexWrap: "wrap" },
-  field: { marginBottom: 10 },
-  saveButton: { backgroundColor: "#1c1c1e", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
-  saveButtonText: { color: "#ffffff", fontWeight: "700", fontSize: 16 },
-  error: { color: "#c62828", fontSize: 14, marginBottom: 10 },
-});
+const makeStyles = (t: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: t.background, padding: 20 },
+    row: { paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: t.separator },
+    rowHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
+    rowTitle: { fontSize: 15, color: t.text },
+    rowValue: { fontSize: 13, color: t.textMuted },
+    rowValueOver: { color: t.danger },
+    progressTrack: { height: 6, borderRadius: 3, backgroundColor: t.fill, overflow: "hidden" },
+    progressFill: { height: "100%", backgroundColor: t.primary },
+    progressFillOver: { backgroundColor: t.danger },
+    empty: { color: t.textMuted, fontSize: 14, paddingVertical: 12 },
+    form: { marginTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: t.separator, paddingTop: 16 },
+    sectionTitle: { fontSize: 14, fontWeight: "600", color: t.text, marginBottom: 8 },
+    chipRow: { flexDirection: "row", flexWrap: "wrap" },
+    field: { marginBottom: 10 },
+    saveButton: { backgroundColor: t.primary, borderRadius: 12, paddingVertical: 14, alignItems: "center" },
+    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    error: { color: t.danger, fontSize: 14, marginBottom: 10 },
+  });
