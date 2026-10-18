@@ -8,8 +8,8 @@ import { wholePercentages, type DonutSegment } from "../lib/chartData";
 // Slice colours: categorical slots 1–5 of the dataviz reference palette for the current theme, in
 // their fixed order, and a gray for the folded tail (theme.chart; validation results in theme.ts).
 // In the light theme slots 3–5 are below 3:1 against the background, so every value is also
-// written in the legend (the palette's relief rule). Slots go by size within the month: there is
-// no filter that could repaint a category.
+// written in the list under the ring (the palette's relief rule). Slots go by size within the
+// month: switching the month or the type redraws a whole new chart, not a filtered one.
 const SIZE = 200;
 const RING = 26;
 const R = (SIZE - RING) / 2;
@@ -25,13 +25,17 @@ function arc(start: number, end: number): string {
   return `M${point(start)} A${R},${R} 0 ${large} 1 ${point(end)}`;
 }
 
-/** This month's expenses by category as a ring; the legend under it is the table of every value. */
-export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]; monthName: string }) {
+/**
+ * A month's expenses or income by category as a ring, the total in the middle. The list under it
+ * gives every category's amount and share with a bar, so no value depends on the colours.
+ */
+export function CategoryDonut({ segments, caption }: { segments: DonutSegment[]; caption: string }) {
   const styles = useThemedStyles(makeStyles);
   const theme = useTheme();
   const [selected, setSelected] = useState<number | null>(null);
   const total = segments.reduce((sum, s) => sum + s.amount, 0);
   const percents = wholePercentages(segments.map((s) => s.amount));
+  const largest = Math.max(...segments.map((s) => s.amount));
 
   // Angles clockwise from 12 o'clock; each slice gives up GAP px of its arc to the surface.
   const gapAngle = segments.length > 1 ? GAP / R : 0;
@@ -55,16 +59,12 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
 
   const center =
     selected === null
-      ? { big: formatMinorUnits(total), small: `за ${monthName}` }
+      ? { big: formatMinorUnits(total), small: caption }
       : { big: `${percents[selected]} %`, small: segments[selected].name };
 
   return (
     <View>
-      <View
-        style={styles.ring}
-        accessible
-        accessibilityLabel={`Расходы за ${monthName}: ${formatMinorUnits(total)}. Доли категорий — в списке ниже.`}
-      >
+      <View style={styles.ring} accessible accessibilityLabel={`${caption}: ${formatMinorUnits(total)}. Доли — в списке ниже.`}>
         <Svg width={SIZE} height={SIZE}>
           {segments.length === 1 ? (
             <Circle cx={C} cy={C} r={R} stroke={segmentColor(theme, segments[0], 0)} strokeWidth={RING} fill="none" />
@@ -101,12 +101,21 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
           accessibilityRole="button"
           accessibilityLabel={`${s.name}: ${formatMinorUnits(s.amount)}, ${percents[i]} %`}
         >
-          <View style={[styles.swatch, { backgroundColor: segmentColor(theme, s, i) }]} />
-          <Text style={styles.name} numberOfLines={1}>
-            {s.name}
-          </Text>
-          <Text style={styles.amount}>{formatMinorUnits(s.amount)}</Text>
-          <Text style={styles.percent}>{percents[i]} %</Text>
+          <View style={styles.rowTop}>
+            <View style={[styles.swatch, { backgroundColor: segmentColor(theme, s, i) }]} />
+            <Text style={styles.name} numberOfLines={1}>
+              {s.icon ? `${s.icon} ` : ""}
+              {s.name}
+            </Text>
+            <Text style={styles.amount}>{formatMinorUnits(s.amount)}</Text>
+          </View>
+          <View style={styles.rowBottom}>
+            {/* Bars are scaled to the largest category, so the biggest one fills the track. */}
+            <View style={styles.track}>
+              <View style={[styles.bar, { width: `${(s.amount / largest) * 100}%`, backgroundColor: segmentColor(theme, s, i) }]} />
+            </View>
+            <Text style={styles.percent}>{percents[i]} %</Text>
+          </View>
         </Pressable>
       ))}
     </View>
@@ -115,7 +124,7 @@ export function ExpenseDonut({ segments, monthName }: { segments: DonutSegment[]
 
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
-    ring: { width: SIZE, height: SIZE, alignSelf: "center", marginBottom: 12 },
+    ring: { width: SIZE, height: SIZE, alignSelf: "center", marginBottom: 16 },
     center: {
       position: "absolute",
       top: RING + 14,
@@ -127,10 +136,14 @@ const makeStyles = (t: Theme) =>
     },
     centerBig: { fontSize: 18, fontWeight: "700", color: t.text },
     centerSmall: { fontSize: 13, color: t.textMuted, marginTop: 2, textAlign: "center" },
-    row: { flexDirection: "row", alignItems: "center", paddingVertical: 9, paddingHorizontal: 6, borderRadius: 8 },
-    rowSelected: { backgroundColor: t.fill },
+    row: { paddingVertical: 9, paddingHorizontal: 6, borderRadius: 10 },
+    rowSelected: { backgroundColor: t.card },
+    rowTop: { flexDirection: "row", alignItems: "center" },
     swatch: { width: 12, height: 12, borderRadius: 3, marginRight: 10 },
     name: { flex: 1, fontSize: 15, color: t.text },
     amount: { fontSize: 15, color: t.text, fontWeight: "600" },
-    percent: { width: 52, fontSize: 14, color: t.textMuted, textAlign: "right" },
+    rowBottom: { flexDirection: "row", alignItems: "center", marginTop: 6, marginLeft: 22 },
+    track: { flex: 1, height: 6, borderRadius: 3, backgroundColor: t.fill, overflow: "hidden" },
+    bar: { height: 6, borderRadius: 3 },
+    percent: { width: 52, fontSize: 13, color: t.textMuted, textAlign: "right" },
   });

@@ -1,3 +1,3 @@
-import { FinanceHomeScreen } from "@ecosystem/finance";
+import { FinanceScreen } from "@ecosystem/finance";
 
-export default FinanceHomeScreen;
+export default FinanceScreen;

@@ -12,15 +12,8 @@ export default function FinanceLayout() {
       <Stack.Screen name="index" options={{ title: "Финансы" }} />
       <Stack.Screen name="accounts" options={{ title: "Счета" }} />
       <Stack.Screen name="budgets" options={{ title: "Бюджеты" }} />
-      <Stack.Screen
-        name="add-transaction"
-        options={{ title: "Новая транзакция", presentation: "modal" }}
-      />
-      <Stack.Screen name="history" options={{ title: "История" }} />
-      <Stack.Screen
-        name="transaction/[id]"
-        options={{ title: "Транзакция", presentation: "modal" }}
-      />
+      <Stack.Screen name="add-transaction" options={{ title: "Новая запись", presentation: "modal" }} />
+      <Stack.Screen name="transaction/[id]" options={{ title: "Запись", presentation: "modal" }} />
     </Stack>
   );
 }

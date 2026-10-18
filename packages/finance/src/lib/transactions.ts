@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, lt } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { db, accounts, categories, transactions } from "@ecosystem/db";
 
@@ -12,12 +12,14 @@ export type TransactionInput = {
   categoryId: number | null;
   counterpartAccountId: number | null;
   note: string | null;
+  /** When it happened; a new transaction without one is dated now. */
+  occurredAt?: number;
 };
 
 const counterpart = alias(accounts, "counterpart");
 
-/** Every transaction, newest first, with the names needed to show it in a list. */
-export async function getTransactionHistory() {
+/** Transactions in [start, end), newest first, with the names and icons needed to show them in a list. */
+export async function getTransactionsBetween(start: number, end: number) {
   return db
     .select({
       id: transactions.id,
@@ -29,15 +31,17 @@ export async function getTransactionHistory() {
       accountName: accounts.name,
       counterpartAccountName: counterpart.name,
       categoryName: categories.name,
+      categoryIcon: categories.icon,
     })
     .from(transactions)
     .innerJoin(accounts, eq(accounts.id, transactions.accountId))
     .leftJoin(counterpart, eq(counterpart.id, transactions.counterpartAccountId))
     .leftJoin(categories, eq(categories.id, transactions.categoryId))
+    .where(and(gte(transactions.occurredAt, start), lt(transactions.occurredAt, end)))
     .orderBy(desc(transactions.occurredAt), desc(transactions.id));
 }
 
-export type TransactionHistoryItem = Awaited<ReturnType<typeof getTransactionHistory>>[number];
+export type TransactionListItem = Awaited<ReturnType<typeof getTransactionsBetween>>[number];
 
 export async function getTransaction(id: number) {
   const rows = await db.select().from(transactions).where(eq(transactions.id, id));
@@ -45,10 +49,10 @@ export async function getTransaction(id: number) {
 }
 
 export async function addTransaction(input: TransactionInput): Promise<void> {
-  await db.insert(transactions).values({ ...input, occurredAt: Date.now() });
+  await db.insert(transactions).values({ ...input, occurredAt: input.occurredAt ?? Date.now() });
 }
 
-/** Changes a transaction but keeps its original date. */
+/** Changes a transaction; its date changes only if `occurredAt` is given. */
 export async function updateTransaction(id: number, input: TransactionInput): Promise<void> {
   await db.update(transactions).set(input).where(eq(transactions.id, id));
 }

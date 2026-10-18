@@ -36,6 +36,13 @@
       "when": 1792263482410,
       "tag": "0004_currency_byn",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792343926116,
+      "tag": "0005_category_icons",
+      "breakpoints": true
     }
   ]
 }

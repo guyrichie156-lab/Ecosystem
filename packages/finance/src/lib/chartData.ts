@@ -1,6 +1,6 @@
 /** Pure helpers behind the finance charts (no database), so they can be unit-tested. */
 
-export type CategorySpend = { categoryId: number | null; name: string; amount: number };
+export type CategorySpend = { categoryId: number | null; name: string; amount: number; icon?: string | null };
 export type DonutSegment = CategorySpend & { other: boolean };
 export type MonthSpend = { monthStart: number; amount: number };
 

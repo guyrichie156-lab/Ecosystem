@@ -1,13 +1,14 @@
 import { db, categories } from "@ecosystem/db";
 
-const DEFAULT_CATEGORIES: { name: string; kind: "income" | "expense" }[] = [
-  { name: "Продукты", kind: "expense" },
-  { name: "Транспорт", kind: "expense" },
-  { name: "Жильё", kind: "expense" },
-  { name: "Развлечения", kind: "expense" },
-  { name: "Здоровье", kind: "expense" },
-  { name: "Зарплата", kind: "income" },
-  { name: "Другое", kind: "expense" },
+// The same icons as migration 0005, which adds them to categories created before it.
+const DEFAULT_CATEGORIES: { name: string; kind: "income" | "expense"; icon: string }[] = [
+  { name: "Продукты", kind: "expense", icon: "🛒" },
+  { name: "Транспорт", kind: "expense", icon: "🚌" },
+  { name: "Жильё", kind: "expense", icon: "🏠" },
+  { name: "Развлечения", kind: "expense", icon: "🎉" },
+  { name: "Здоровье", kind: "expense", icon: "💊" },
+  { name: "Зарплата", kind: "income", icon: "💼" },
+  { name: "Другое", kind: "expense", icon: "📦" },
 ];
 
 /** Seeds a starter set of categories on first launch so the transaction form isn't empty. */

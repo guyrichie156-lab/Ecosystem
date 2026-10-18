@@ -14,6 +14,8 @@ import {
   type TransactionType,
 } from "../lib/transactions";
 import { Chip } from "../components/Chip";
+import { DateField } from "../components/DateField";
+import { occurredAtFor, startOfDay } from "../lib/period";
 
 function labelForType(t: TransactionType) {
   if (t === "income") return "Доход";
@@ -54,6 +56,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [amountText, setAmountText] = useState("");
   const [note, setNote] = useState("");
+  const [day, setDay] = useState(() => startOfDay(Date.now()));
   const [saving, setSaving] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +71,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
     setCategoryId(existing.categoryId);
     setAmountText(minorUnitsToInput(existing.amount));
     setNote(existing.note ?? "");
+    setDay(startOfDay(existing.occurredAt));
   }, [existing]);
 
   const filteredCategories = (data?.categories ?? []).filter(
@@ -114,6 +118,8 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       categoryId: type === "transfer" ? null : categoryId,
       counterpartAccountId: type === "transfer" ? counterpartAccountId : null,
       note: note || null,
+      // An edited record keeps its exact time unless its day was changed.
+      occurredAt: existing && startOfDay(existing.occurredAt) === day ? undefined : occurredAtFor(day, Date.now()),
     };
 
     setSaving(true);
@@ -154,7 +160,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
   if (isEdit && data && !existing) {
     return (
       <View style={styles.container}>
-        <Text style={styles.missing}>Транзакция не найдена — возможно, она уже удалена.</Text>
+        <Text style={styles.missing}>Запись не найдена — возможно, она уже удалена.</Text>
       </View>
     );
   }
@@ -198,7 +204,12 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
           <Text style={styles.sectionTitle}>Категория</Text>
           <View style={styles.chipRow}>
             {filteredCategories.map((c) => (
-              <Chip key={c.id} label={c.name} selected={categoryId === c.id} onPress={() => setCategoryId(c.id)} />
+              <Chip
+                key={c.id}
+                label={c.icon ? `${c.icon} ${c.name}` : c.name}
+                selected={categoryId === c.id}
+                onPress={() => setCategoryId(c.id)}
+              />
             ))}
           </View>
         </>
@@ -212,6 +223,9 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
         onChangeText={setAmountText}
       />
 
+      <Text style={styles.sectionTitle}>Дата</Text>
+      <DateField value={day} onChange={setDay} />
+
       <Text style={styles.sectionTitle}>Заметка</Text>
       <TextField placeholder="Необязательно" value={note} onChangeText={setNote} />
 
@@ -224,7 +238,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       {isEdit && (
         <Pressable style={styles.deleteButton} onPress={handleDelete} disabled={saving}>
           <Text style={styles.deleteButtonText}>
-            {confirmingDelete ? "Нажмите ещё раз, чтобы удалить" : "Удалить транзакцию"}
+            {confirmingDelete ? "Нажмите ещё раз, чтобы удалить" : "Удалить запись"}
           </Text>
         </Pressable>
       )}
