@@ -10,7 +10,6 @@ import { MonthlyBars } from "./MonthlyBars";
 
 const monthShort = new Intl.DateTimeFormat("ru-RU", { month: "short" });
 
-/** Plain number for the table: the column header already says BYN. */
 /** «Отчёты»: the overall balance, accounts, expenses by month and the month-by-month table. */
 export function ReportsTab() {
   const styles = useThemedStyles(makeStyles);
