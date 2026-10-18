@@ -3,7 +3,7 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "r
 import { Link } from "expo-router";
 import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { getAccountBalance, getActiveAccounts, getTotalBalance } from "../lib/balance";
-import { formatMinorUnits } from "../lib/money";
+import { formatAmount, formatMinorUnits } from "../lib/money";
 import { monthlyReport, summarize } from "../lib/records";
 import { getMonthlySpend, getReportRows } from "../lib/stats";
 import { MonthlyBars } from "./MonthlyBars";
@@ -11,9 +11,6 @@ import { MonthlyBars } from "./MonthlyBars";
 const monthShort = new Intl.DateTimeFormat("ru-RU", { month: "short" });
 
 /** Plain number for the table: the column header already says BYN. */
-const amount = (minorUnits: number) =>
-  (minorUnits / 100).toLocaleString("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
 /** «Отчёты»: the overall balance, accounts, expenses by month and the month-by-month table. */
 export function ReportsTab() {
   const styles = useThemedStyles(makeStyles);
@@ -89,9 +86,9 @@ export function ReportsTab() {
               {year.months.map((m) => (
                 <View key={`${m.year}-${m.month}`} style={styles.tableRow}>
                   <Text style={styles.cellMonth}>{monthShort.format(new Date(m.year, m.month, 1))}</Text>
-                  <Text style={styles.cell}>{amount(m.expense)}</Text>
-                  <Text style={styles.cell}>{amount(m.income)}</Text>
-                  <Text style={[styles.cell, m.balance < 0 && styles.negative]}>{amount(m.balance)}</Text>
+                  <Text style={styles.cell}>{formatAmount(m.expense)}</Text>
+                  <Text style={styles.cell}>{formatAmount(m.income)}</Text>
+                  <Text style={[styles.cell, m.balance < 0 && styles.negative]}>{formatAmount(m.balance)}</Text>
                 </View>
               ))}
             </View>

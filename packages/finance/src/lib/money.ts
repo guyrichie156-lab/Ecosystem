@@ -1,15 +1,20 @@
 /** The only currency the app works in: Belarusian rubles (ISO 4217 code BYN). */
 export const APP_CURRENCY = "BYN";
 
+const twoDecimals = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/**
+ * An amount in minor units without the currency, e.g. -5500 -> "−55,00". Negative amounts get a true
+ * minus sign (U+2212), the one in front of a record's amount; Intl gives a hyphen for ru-RU.
+ */
+export function formatAmount(minorUnits: number): string {
+  return `${minorUnits < 0 ? "−" : ""}${twoDecimals.format(Math.abs(minorUnits) / 100)}`;
+}
+
 /** Formats an integer amount in minor units (e.g. kopecks) as a display string, e.g. 150050 -> "1 500,50 BYN". */
 export function formatMinorUnits(minorUnits: number, currency: string = APP_CURRENCY): string {
-  const major = minorUnits / 100;
-  const formatted = new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(major);
   const symbol = currency === "RUB" ? "₽" : currency;
-  return `${formatted} ${symbol}`;
+  return `${formatAmount(minorUnits)} ${symbol}`;
 }
 
 /**
