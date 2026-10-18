@@ -7,22 +7,22 @@ const at = (y: number, m: number, d: number, h = 12) => new Date(y, m, d, h).get
 const row = (type: "income" | "expense" | "transfer", amount: number, occurredAt: number) => ({ type, amount, occurredAt });
 
 test("a month's summary leaves transfers out", () => {
-  const rows = [row("expense", 1870, at(2026, 7, 2)), row("income", 5000, at(2026, 7, 3)), row("transfer", 900, at(2026, 7, 3))];
-  assert.deepEqual(summarize(rows), { income: 5000, expense: 1870, balance: 3130 });
+  const rows = [row("expense", 1500, at(2026, 7, 4)), row("income", 5000, at(2026, 7, 5)), row("transfer", 900, at(2026, 7, 5))];
+  assert.deepEqual(summarize(rows), { income: 5000, expense: 1500, balance: 3500 });
 });
 
 test("records group by day with each day's income and expenses", () => {
   const rows = [
-    row("expense", 300, at(2026, 7, 3, 18)),
-    row("income", 1000, at(2026, 7, 3, 9)),
-    row("expense", 1870, at(2026, 7, 2)),
-    row("expense", 130, at(2026, 7, 2, 8)),
+    row("expense", 300, at(2026, 7, 5, 18)),
+    row("income", 1000, at(2026, 7, 5, 9)),
+    row("expense", 1500, at(2026, 7, 4)),
+    row("expense", 500, at(2026, 7, 4, 8)),
   ];
   const days = groupByDay(rows);
   assert.equal(days.length, 2);
   assert.deepEqual([days[0].expense, days[0].income, days[0].data.length], [300, 1000, 2]);
   assert.deepEqual([days[1].expense, days[1].income, days[1].data.length], [2000, 0, 2]);
-  assert.equal(new Date(days[1].day).getDate(), 2);
+  assert.equal(new Date(days[1].day).getDate(), 4);
 });
 
 test("the report has only months with money moving, newest first, by year", () => {
