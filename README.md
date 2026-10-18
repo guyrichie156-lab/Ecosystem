@@ -5,7 +5,15 @@
 
 Установить с компьютера (телефон подключён кабелем): `adb install -r <файл>.apk`.
 
-## ecosystem-2026-10-17-2.apk — новый
+## ecosystem-2026-10-18.apk — новый
+Скачать: https://github.com/guyrichie156-lab/Ecosystem/raw/apk/ecosystem-2026-10-18.apk
+
+- Собран 2026-10-18 из ветки `feature/finance-redesign` (87f4a55). В ней всё из второй сборки и ветка `feature/theme`.
+- Новое: тема как в телефоне (светлая или тёмная); «Финансы» по образцу приложения пользователя — вкладки «Записи / Графики / Отчёты», выбор месяца, записи по дням с суммами за день, дата записи (сегодня, вчера или день в календаре), значки категорий, графики расходов и доходов за месяц, таблица по месяцам.
+- Android 8.0 и новее, процессоры ARM (`arm64-v8a`, `armeabi-v7a`).
+- 65 801 414 байт, SHA-256 `7a1fcbd600fce233e8001e1b22814cb39bca75e52e00a1cfe3313db0ddd54cb2`.
+
+## ecosystem-2026-10-17-2.apk — второй
 Скачать: https://github.com/guyrichie156-lab/Ecosystem/raw/apk/ecosystem-2026-10-17-2.apk
 
 - Собран 2026-10-17 из основной ветки `max/jolly-feynman-ykq4yw` (86fec22) вместе с `feature/health-mvp` (b9a2eae, внутри `feature/text-field`) и `feature/finance-charts` (5790dba, внутри `feature/currency-byn`).
