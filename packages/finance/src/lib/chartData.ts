@@ -1,19 +1,22 @@
 /** Pure helpers behind the finance charts (no database), so they can be unit-tested. */
 
 export type CategorySpend = { categoryId: number | null; name: string; amount: number; icon?: string | null };
+/** `other`: drawn in the neutral grey instead of a palette colour (the folded tail). */
 export type DonutSegment = CategorySpend & { other: boolean };
 export type MonthSpend = { monthStart: number; amount: number };
 
 /**
- * At most `maxSegments` slices: a donut stops working past ~6 (dataviz skill), so the
- * smallest categories fold into one "Остальные (N)" slice — not "Другое", which is a real
- * default category. Input must be sorted largest first.
+ * At most `colours` coloured slices (the palette size, theme.chart.slots) and one grey slice: a
+ * donut stops working past ~6 slices (dataviz skill). The smallest categories fold into one
+ * "Остальные (N)" slice — not "Другое", which is a real default category; a single leftover
+ * category keeps its own name and is only drawn grey. Input must be sorted largest first.
  */
-export function foldCategories(rows: CategorySpend[], maxSegments = 6): DonutSegment[] {
+export function foldCategories(rows: CategorySpend[], colours = 5): DonutSegment[] {
   const positive = rows.filter((r) => r.amount > 0);
-  if (positive.length <= maxSegments) return positive.map((r) => ({ ...r, other: false }));
-  const kept = positive.slice(0, maxSegments - 1).map((r) => ({ ...r, other: false }));
-  const tail = positive.slice(maxSegments - 1);
+  const kept = positive.slice(0, colours).map((r) => ({ ...r, other: false }));
+  const tail = positive.slice(colours);
+  if (tail.length === 0) return kept;
+  if (tail.length === 1) return [...kept, { ...tail[0], other: true }];
   const rest = tail.reduce((sum, r) => sum + r.amount, 0);
   return [...kept, { categoryId: null, name: `Остальные (${tail.length})`, amount: rest, other: true }];
 }

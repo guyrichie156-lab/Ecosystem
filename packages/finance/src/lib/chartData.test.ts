@@ -4,7 +4,7 @@ import { bucketByMonth, foldCategories, monthStarts, wholePercentages } from "./
 
 const row = (name: string, amount: number, categoryId: number | null = null) => ({ categoryId, name, amount });
 
-test("up to six categories stay as they are", () => {
+test("up to five categories stay as they are", () => {
   const rows = [row("Еда", 500, 1), row("Транспорт", 300, 2), row("Кафе", 100, 3)];
   assert.deepEqual(
     foldCategories(rows).map((s) => [s.name, s.amount, s.other]),
@@ -16,12 +16,30 @@ test("up to six categories stay as they are", () => {
   );
 });
 
+test("a sixth category keeps its name but is drawn grey: the palette has five colours", () => {
+  // The six default expense categories (seed.ts), all with spending in the month.
+  const rows = [60, 50, 40, 30, 20, 10].map((a, i) => row(`К${i + 1}`, a, i + 1));
+  const segments = foldCategories(rows);
+  assert.deepEqual(
+    segments.map((s) => [s.name, s.other]),
+    [["К1", false], ["К2", false], ["К3", false], ["К4", false], ["К5", false], ["К6", true]]
+  );
+});
+
 test("past six categories the smallest fold into one «Остальные» slice", () => {
   const rows = [70, 60, 50, 40, 30, 20, 10].map((a, i) => row(`К${i + 1}`, a, i + 1));
   const segments = foldCategories(rows);
   assert.equal(segments.length, 6);
   assert.deepEqual(segments.slice(0, 5).map((s) => s.name), ["К1", "К2", "К3", "К4", "К5"]);
   assert.deepEqual([segments[5].name, segments[5].amount, segments[5].other], ["Остальные (2)", 30, true]);
+});
+
+test("every coloured slice has a palette colour, whatever the number of categories", () => {
+  for (let n = 1; n <= 9; n++) {
+    const rows = Array.from({ length: n }, (_, i) => row(`К${i + 1}`, 100 - i, i + 1));
+    const coloured = foldCategories(rows, 5).filter((s) => !s.other).length;
+    assert.ok(coloured <= 5, `${n} categories give ${coloured} coloured slices`);
+  }
 });
 
 test("categories with nothing spent are left out", () => {

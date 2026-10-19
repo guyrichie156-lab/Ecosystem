@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SegmentedControl, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
+import { SegmentedControl, useAsyncData, useRefreshOnFocus, useTheme, useThemedStyles, type Theme } from "@ecosystem/core";
 import { foldCategories } from "../lib/chartData";
 import { getMonthByCategory } from "../lib/stats";
 import { type Month } from "../lib/period";
@@ -15,8 +15,10 @@ const monthName = new Intl.DateTimeFormat("ru-RU", { month: "long" });
 export function ChartsTab({ month, onMonthChange }: { month: Month; onMonthChange: (month: Month) => void }) {
   const styles = useThemedStyles(makeStyles);
   const [kind, setKind] = useState<Kind>("expense");
+  // As many coloured slices as the palette has colours (the same five in both themes).
+  const colours = useTheme().chart.slots.length;
   const { data, loading, refresh } = useAsyncData(
-    () => getMonthByCategory(month, kind).then(foldCategories),
+    () => getMonthByCategory(month, kind).then((rows) => foldCategories(rows, colours)),
     [month.year, month.month, kind]
   );
   useRefreshOnFocus(refresh);
