@@ -74,4 +74,5 @@
 ## Техдолг
 - ⬜ Переход на Expo SDK 58, после него удалить `patches/expo-sqlite@57.0.1.patch`.
 - ⬜ Лишние разрешения в APK: `SYSTEM_ALERT_WINDOW` и `READ/WRITE_EXTERNAL_STORAGE` пришли из шаблона Expo (отчёт слияния манифеста), в коде приложения не используются. Убрать через `android.blockedPermissions` в `app.json` (`@expo/config-plugins` 57.0.7 ставит им `tools:node="remove"`).
-- 🔄 Автотесты: появились первые — правила подсказок «Здоровья» (`pnpm test`). Остальной код без тестов.
+- 🔄 Автотесты и линтер: 50 тестов в трёх пакетах (деньги, даты, записи, графики, проверки форм, замеры, подсказки, Health Connect), проверка их типов и линтер Expo — `pnpm test`, `pnpm lint` (ветка `feature/code-cleanup`, 2026-10-19). Запросы к базе тестами не покрыты.
+- 🔄 Ревью кода и чистка по нему (2026-10-19): ветка `feature/code-cleanup` поверх `feature/finance-redesign`, ждёт проверки на телефоне. Подробнее — [[decisions]], [[research/code-review]].
