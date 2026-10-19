@@ -3,7 +3,8 @@ import { FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View }
 import { TextField, describeError, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { db, accounts as accountsTable } from "@ecosystem/db";
 import { getAccountBalance } from "../lib/balance";
-import { APP_CURRENCY, formatMinorUnits, parseMinorUnits } from "../lib/money";
+import { APP_CURRENCY, formatMinorUnits } from "../lib/money";
+import { checkAccountForm } from "../lib/validation";
 import { Chip } from "../components/Chip";
 
 type AccountType = "cash" | "bank" | "card" | "savings";
@@ -30,24 +31,19 @@ export function AccountsScreen() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
-    if (!name.trim()) {
-      setError("Введите название счёта.");
-      return;
-    }
-    // Negative is allowed: a credit card or a debt starts below zero.
-    const initial = parseMinorUnits(initialBalanceText || "0", { allowNegative: true });
-    if (initial === null) {
-      setError("Начальный баланс — число, например 1 000 или -500,50.");
+    const checked = checkAccountForm({ name, initialBalanceText });
+    if (!checked.ok) {
+      setError(checked.error);
       return;
     }
     setError(null);
     setSaving(true);
     try {
       await db.insert(accountsTable).values({
-        name: name.trim(),
+        name: checked.value.name,
         type,
         currency: APP_CURRENCY,
-        initialBalance: initial,
+        initialBalance: checked.value.initialBalance,
       });
       setName("");
       setInitialBalanceText("");

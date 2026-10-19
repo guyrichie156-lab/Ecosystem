@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
-import { parseMinorUnits } from "../lib/money";
+import { checkTransactionForm } from "../lib/validation";
 import { runAfterTransactionChange } from "../lib/notifications";
 import {
   addTransaction,
@@ -92,30 +92,23 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
 
   async function handleSave() {
     // Shown under the form rather than in Alert, which does nothing on web.
-    const amount = parseMinorUnits(amountText);
-    if (!amount || amount <= 0) {
-      setError("Введите сумму, например 1500 или 1500,50.");
-      return;
-    }
-    if (!accountId) {
-      setError("Выберите счёт.");
-      return;
-    }
-    if (type === "transfer" && (!counterpartAccountId || counterpartAccountId === accountId)) {
-      setError("Выберите счёт получателя.");
+    const checked = checkTransactionForm({ type, amountText, accountId, counterpartAccountId });
+    if (!checked.ok) {
+      setError(checked.error);
       return;
     }
     setError(null);
-    const account = data?.accounts.find((a) => a.id === accountId);
+    const { amount, accountId: fromAccountId } = checked.value;
+    const account = data?.accounts.find((a) => a.id === fromAccountId);
     if (!account) return;
 
     const input = {
-      accountId,
+      accountId: fromAccountId,
       type,
       amount,
       currency: account.currency,
       categoryId: type === "transfer" ? null : categoryId,
-      counterpartAccountId: type === "transfer" ? counterpartAccountId : null,
+      counterpartAccountId: checked.value.counterpartAccountId,
       note: note || null,
       // An edited record keeps its exact time unless its day was changed.
       occurredAt: existing && startOfDay(existing.occurredAt) === day ? undefined : occurredAtFor(day, Date.now()),
@@ -130,7 +123,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       }
       await runAfterTransactionChange({
         categoryId: type === "expense" ? categoryId : null,
-        accountIds: input.counterpartAccountId ? [accountId, input.counterpartAccountId] : [accountId],
+        accountIds: input.counterpartAccountId ? [fromAccountId, input.counterpartAccountId] : [fromAccountId],
       });
       router.back();
     } catch (e) {

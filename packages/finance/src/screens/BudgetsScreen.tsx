@@ -4,7 +4,8 @@ import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } f
 import { db, budgets as budgetsTable, categories as categoriesTable } from "@ecosystem/db";
 import { eq } from "drizzle-orm";
 import { getBudgetStatuses } from "../lib/balance";
-import { formatMinorUnits, parseMinorUnits } from "../lib/money";
+import { formatMinorUnits } from "../lib/money";
+import { checkBudgetForm } from "../lib/validation";
 import { Chip } from "../components/Chip";
 
 function currentMonth(): string {
@@ -28,25 +29,21 @@ export function BudgetsScreen() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
-    if (!categoryId) {
-      setError("Выберите категорию.");
-      return;
-    }
-    if (data?.statuses.some((b) => b.categoryId === categoryId)) {
-      setError("Для этой категории бюджет уже есть.");
-      return;
-    }
-    const limit = parseMinorUnits(limitText);
-    if (!limit || limit <= 0) {
-      setError("Лимит — число больше нуля, например 15 000.");
+    const checked = checkBudgetForm({
+      categoryId,
+      limitText,
+      budgetedCategoryIds: (data?.statuses ?? []).map((b) => b.categoryId),
+    });
+    if (!checked.ok) {
+      setError(checked.error);
       return;
     }
     setError(null);
     setSaving(true);
     try {
       await db.insert(budgetsTable).values({
-        categoryId,
-        amountLimit: limit,
+        categoryId: checked.value.categoryId,
+        amountLimit: checked.value.amountLimit,
         period: "monthly",
         startMonth: currentMonth(),
       });
