@@ -2,10 +2,9 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useThemedStyles, type Theme } from "@ecosystem/core";
 import { addMonths, compareMonths, monthOf, type Month } from "../lib/period";
+import { monthYearFormat } from "../lib/format";
 
-const monthLabel = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" });
-
-export const formatMonth = (m: Month) => monthLabel.format(new Date(m.year, m.month, 1));
+export const formatMonth = (m: Month) => monthYearFormat.format(new Date(m.year, m.month, 1));
 
 /** "‹ август 2026 г. ›": steps through months; there is no month after the current one. */
 export function MonthSwitcher({ month, onChange }: { month: Month; onChange: (month: Month) => void }) {

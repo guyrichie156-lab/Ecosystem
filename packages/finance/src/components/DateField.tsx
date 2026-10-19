@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Chip, useThemedStyles, type Theme } from "@ecosystem/core";
 import { addMonths, calendarWeeks, compareMonths, monthOf, startOfDay, type Month } from "../lib/period";
+import { monthYearFormat as monthFormat } from "../lib/format";
 
 const dayFormat = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" });
-const monthFormat = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" });
 const WEEKDAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -15,6 +15,7 @@ const DAY = 24 * 60 * 60 * 1000;
 export function DateField({ value, onChange }: { value: number; onChange: (day: number) => void }) {
   const styles = useThemedStyles(makeStyles);
   const today = startOfDay(Date.now());
+  // Half a day back is always yesterday, also on the days the clocks change (a day of 23 or 25 hours).
   const yesterday = startOfDay(today - DAY / 2);
   const day = startOfDay(value);
   const [open, setOpen] = useState(false);

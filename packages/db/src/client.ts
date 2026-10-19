@@ -4,8 +4,6 @@ import * as schema from "./schema";
 
 export const DATABASE_NAME = "ecosystem.db";
 
-export const sqliteDb = openDatabaseSync(DATABASE_NAME, {
-  enableChangeListener: true,
-});
+export const sqliteDb = openDatabaseSync(DATABASE_NAME);
 
 export const db = drizzle(sqliteDb, { schema });

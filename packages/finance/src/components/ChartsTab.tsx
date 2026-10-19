@@ -5,6 +5,7 @@ import { foldCategories } from "../lib/chartData";
 import { getMonthByCategory } from "../lib/stats";
 import { type Month } from "../lib/period";
 import { CategoryDonut } from "./CategoryDonut";
+import { FAB_CLEARANCE } from "./layout";
 import { MonthSwitcher } from "./MonthSwitcher";
 
 type Kind = "expense" | "income";
@@ -58,7 +59,7 @@ export function ChartsTab({ month, onMonthChange }: { month: Month; onMonthChang
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
     list: { flex: 1 },
-    content: { paddingHorizontal: 20, paddingBottom: 110 },
+    content: { paddingHorizontal: 20, paddingBottom: FAB_CLEARANCE },
     month: { marginTop: 8, marginBottom: 8 },
     empty: { fontSize: 15, color: t.textMuted, marginTop: 28, textAlign: "center" },
   });

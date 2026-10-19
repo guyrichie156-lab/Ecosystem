@@ -7,6 +7,7 @@ import { addMonths, monthBounds, type Month } from "../lib/period";
 import { groupByDay, summarize } from "../lib/records";
 import { getTransactionsBetween, type TransactionListItem } from "../lib/transactions";
 import { CategoryIcon } from "./CategoryIcon";
+import { FAB_CLEARANCE } from "./layout";
 import { MonthSwitcher, formatMonth } from "./MonthSwitcher";
 
 const dayFormat = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
@@ -118,8 +119,7 @@ export function RecordsTab({ month, onMonthChange }: { month: Month; onMonthChan
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
     list: { flex: 1 },
-    // Room at the bottom for the floating «+» button.
-    content: { paddingHorizontal: 20, paddingBottom: 110 },
+    content: { paddingHorizontal: 20, paddingBottom: FAB_CLEARANCE },
     totals: { flexDirection: "row", backgroundColor: t.card, borderRadius: 14, paddingVertical: 12, marginTop: 4 },
     total: { flex: 1, alignItems: "center", paddingHorizontal: 4 },
     totalLabel: { fontSize: 13, color: t.textMuted },

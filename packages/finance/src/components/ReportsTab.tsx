@@ -3,12 +3,12 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "r
 import { Link } from "expo-router";
 import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { getAccountBalance, getActiveAccounts, getTotalBalance } from "../lib/balance";
-import { formatAmount, formatMinorUnits } from "../lib/money";
+import { APP_CURRENCY, formatAmount, formatMinorUnits } from "../lib/money";
 import { monthlyReport, summarize } from "../lib/records";
 import { getMonthlySpend, getReportRows } from "../lib/stats";
+import { monthShortFormat as monthShort } from "../lib/format";
 import { MonthlyBars } from "./MonthlyBars";
-
-const monthShort = new Intl.DateTimeFormat("ru-RU", { month: "short" });
+import { FAB_CLEARANCE } from "./layout";
 
 /** «Отчёты»: the overall balance, accounts, expenses by month and the month-by-month table. */
 export function ReportsTab() {
@@ -72,7 +72,7 @@ export function ReportsTab() {
 
       {data && data.report.length > 0 && (
         <>
-          <Text style={[styles.sectionTitle, styles.spaced]}>По месяцам, BYN</Text>
+          <Text style={[styles.sectionTitle, styles.spaced]}>По месяцам, {APP_CURRENCY}</Text>
           <View style={[styles.tableRow, styles.tableHead]}>
             <Text style={[styles.cellMonth, styles.headText]}>Месяц</Text>
             <Text style={[styles.cell, styles.headText]}>Расходы</Text>
@@ -101,7 +101,7 @@ export function ReportsTab() {
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
     list: { flex: 1 },
-    content: { paddingHorizontal: 20, paddingBottom: 110 },
+    content: { paddingHorizontal: 20, paddingBottom: FAB_CLEARANCE },
     heroLabel: { fontSize: 15, color: t.textMuted, textAlign: "center", marginTop: 8 },
     hero: { fontSize: 36, fontWeight: "700", color: t.text, textAlign: "center", marginTop: 4 },
     totals: { flexDirection: "row", backgroundColor: t.card, borderRadius: 14, paddingVertical: 12, marginTop: 16 },

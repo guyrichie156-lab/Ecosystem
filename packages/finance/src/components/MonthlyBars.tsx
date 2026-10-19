@@ -4,6 +4,7 @@ import Svg, { Line, Path, Text as SvgText } from "react-native-svg";
 import { niceTicks, useTheme, useThemedStyles, type Theme } from "@ecosystem/core";
 import { formatMinorUnits } from "../lib/money";
 import type { MonthSpend } from "../lib/chartData";
+import { monthShortFormat as monthShort, monthYearFormat as monthLong } from "../lib/format";
 
 // One series, so one hue: the selected month in categorical slot 1, the rest in the blue-ramp step
 // the palette allows for discrete marks in this theme (theme.chart.selected / theme.chart.rest).
@@ -16,9 +17,6 @@ const HEIGHT = 180;
 const PAD = { top: 10, right: 8, bottom: 24, left: 48 };
 const MAX_BAR = 24;
 const CORNER = 4;
-
-const monthShort = new Intl.DateTimeFormat("ru-RU", { month: "short" });
-const monthLong = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" });
 
 /** Axis ticks in whole rubles, compact from a thousand up: 0 / 500 / 1 тыс. / 1,5 тыс. */
 function formatTick(rubles: number): string {

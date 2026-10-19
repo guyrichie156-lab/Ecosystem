@@ -1,11 +1,9 @@
 import { sql } from "drizzle-orm";
 import { db, accounts, categories, budgets } from "@ecosystem/db";
 import { activeAccountIds } from "./activeAccounts";
+import { monthBounds, monthOf } from "./period";
 
-function currentMonthStartMillis(): number {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-}
+const currentMonthStartMillis = () => monthBounds(monthOf(new Date())).start;
 
 export async function getActiveAccounts() {
   return db.select().from(accounts).where(sql`${accounts.archivedAt} IS NULL`);

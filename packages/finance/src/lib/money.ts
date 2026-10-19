@@ -13,8 +13,7 @@ export function formatAmount(minorUnits: number): string {
 
 /** Formats an integer amount in minor units (e.g. kopecks) as a display string, e.g. 150050 -> "1 500,50 BYN". */
 export function formatMinorUnits(minorUnits: number, currency: string = APP_CURRENCY): string {
-  const symbol = currency === "RUB" ? "₽" : currency;
-  return `${formatAmount(minorUnits)} ${symbol}`;
+  return `${formatAmount(minorUnits)} ${currency}`;
 }
 
 /**

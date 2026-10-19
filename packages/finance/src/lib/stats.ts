@@ -1,15 +1,12 @@
 import { sql } from "drizzle-orm";
 import { db } from "@ecosystem/db";
 import { bucketByMonth, monthStarts, type CategorySpend, type MonthSpend } from "./chartData";
-import { monthBounds, type Month } from "./period";
+import { monthBounds, monthOf, type Month } from "./period";
 import { activeAccountIds } from "./activeAccounts";
 
-const nextMonthStart = (now: Date) => new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
-
-export type CategoryTotal = CategorySpend;
 
 /** A month's expenses or income on active accounts per category, largest first. */
-export async function getMonthByCategory(month: Month, type: "expense" | "income"): Promise<CategoryTotal[]> {
+export async function getMonthByCategory(month: Month, type: "expense" | "income"): Promise<CategorySpend[]> {
   const { start, end } = monthBounds(month);
   const rows = await db.all<{ categoryId: number | null; name: string | null; icon: string | null; amount: number }>(sql`
     SELECT t.category_id AS categoryId, c.name AS name, c.icon AS icon, SUM(t.amount) AS amount
@@ -31,7 +28,7 @@ export async function getMonthByCategory(month: Month, type: "expense" | "income
  */
 export async function getMonthlySpend(months = 6, now = new Date()): Promise<MonthSpend[]> {
   const starts = monthStarts(months, now);
-  const end = nextMonthStart(now);
+  const end = monthBounds(monthOf(now)).end;
   const rows = await db.all<{ occurredAt: number; amount: number }>(sql`
     SELECT occurred_at AS occurredAt, amount
     FROM transactions

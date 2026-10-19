@@ -16,7 +16,7 @@ const R = (SIZE - RING) / 2;
 const C = SIZE / 2;
 const GAP = 2; // px of surface between slices
 
-export const segmentColor = (theme: Theme, segment: DonutSegment, index: number) =>
+const segmentColor = (theme: Theme, segment: DonutSegment, index: number) =>
   segment.other ? theme.chart.other : theme.chart.slots[index];
 
 function arc(start: number, end: number): string {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { describeError, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
@@ -47,9 +47,10 @@ export function MeasurementDetailScreen({ kind }: { kind: BodyMeasurementKind })
   useRefreshOnFocus(refresh);
 
   const points = data ?? [];
-  const [selected, setSelected] = useState(-1);
-  // Default to the latest point whenever the series changes.
-  useEffect(() => setSelected(points.length - 1), [points.length]);
+  // The chosen point by id, so the choice survives a deletion; nothing chosen means the latest.
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const chosen = points.findIndex((p) => p.id === selectedId);
+  const selected = chosen >= 0 ? chosen : points.length - 1;
 
   const [error, setError] = useState<string | null>(null);
 
@@ -89,7 +90,7 @@ export function MeasurementDetailScreen({ kind }: { kind: BodyMeasurementKind })
             <LineChart
               points={points.map((p) => ({ x: p.measuredAt, y: p.value / info.scale }))}
               selectedIndex={selected}
-              onSelect={setSelected}
+              onSelect={(i) => setSelectedId(points[i]?.id ?? null)}
               formatTick={(v) => tickFormat.format(v)}
               minTickStep={0.1}
               accessibilityLabel={`График: ${info.label}, ${points.length} замеров. Значения — в списке ниже.`}

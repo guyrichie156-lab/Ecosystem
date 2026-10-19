@@ -13,7 +13,8 @@ const SEX_OPTIONS: { value: Sex | null; label: string }[] = [
 export function HealthProfileScreen() {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
-  const initial = getHealthProfile();
+  // Read once: the stored profile is only the starting value of the form.
+  const [initial] = useState(getHealthProfile);
   const [heightText, setHeightText] = useState(initial.heightMm ? String(initial.heightMm / 10) : "");
   const [sex, setSex] = useState<Sex | null>(initial.sex);
   const [error, setError] = useState<string | null>(null);
