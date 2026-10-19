@@ -15,7 +15,7 @@ function labelForAccountType(t: AccountType) {
 
 export function AccountsScreen() {
   const styles = useThemedStyles(makeStyles);
-  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(getAccountsWithBalances, []);
+  const { data, refreshing, refresh, pullToRefresh } = useAsyncData(getAccountsWithBalances, []);
   useRefreshOnFocus(refresh);
 
   const [name, setName] = useState("");

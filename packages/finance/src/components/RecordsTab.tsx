@@ -55,9 +55,8 @@ export function RecordsTab({ month, onMonthChange }: { month: Month; onMonthChan
   }, [month.year, month.month]);
   useRefreshOnFocus(refresh);
 
-  const items = data ?? [];
-  const totals = useMemo(() => summarize(items), [items]);
-  const sections = useMemo(() => groupByDay(items), [items]);
+  const totals = useMemo(() => summarize(data ?? []), [data]);
+  const sections = useMemo(() => groupByDay(data ?? []), [data]);
   const open = useCallback((id: number) => router.push(`/finance/transaction/${id}`), [router]);
   const previous = addMonths(month, -1);
 

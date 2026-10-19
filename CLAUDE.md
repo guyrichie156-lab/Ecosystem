@@ -33,7 +33,8 @@ The user prioritises speed. Tabs render on first visit (`lazy`, default `true`).
 - Android (dev, by cable): `cd apps/mobile && pnpm android`
 - Android APK: `cd apps/mobile && pnpm android:release`. In the Claude cloud environment it needs extra setup (Java 17, Android SDK, Maven Central mirror): see `notes/architecture.md`.
 - Typecheck: `cd apps/mobile && pnpm typecheck` (twice: as-is, and with `.android` files via `tsconfig.android.json`)
-- Tests: `pnpm test` (root; health tip rules)
+- Tests: `pnpm test` (root): type-checks the tests (`tsconfig.test.json`), then runs every package's `node:test` files
+- Lint: `pnpm lint` (root; Expo's ESLint config, `eslint.config.cjs`)
 
 The Android widget (`react-native-android-widget`) is Android-only; guard its calls with `Platform.OS === "android"`.
 Health Connect is Android-only and its library loads its native module on import: use it only from `*.android.ts` files with a plain `*.ts` stub next to them.

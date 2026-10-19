@@ -1,0 +1,13 @@
+{
+  // Type-checks the unit tests, which `pnpm typecheck` in apps/mobile doesn't include and `tsx` runs
+  // without checking types. Used by `pnpm test` in the repository root.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    "lib": ["ES2022", "DOM"],
+    "target": "ES2022",
+    "module": "ESNext"
+  },
+  "include": ["packages/*/src/**/*.test.ts"]
+}

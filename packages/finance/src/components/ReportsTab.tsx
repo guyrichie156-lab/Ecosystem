@@ -13,7 +13,7 @@ import { FAB_CLEARANCE } from "./layout";
 /** «Отчёты»: the overall balance, accounts, expenses by month and the month-by-month table. */
 export function ReportsTab() {
   const styles = useThemedStyles(makeStyles);
-  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
+  const { data, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const [balance, accounts, rows, monthly] = await Promise.all([
       getTotalBalance(),
       getActiveAccounts(),

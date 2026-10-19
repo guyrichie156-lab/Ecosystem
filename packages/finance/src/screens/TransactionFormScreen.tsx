@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { Chip, PrimaryButton, TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
@@ -34,37 +34,44 @@ export function EditTransactionScreen({ transactionId }: { transactionId: number
   return <TransactionForm transactionId={transactionId} />;
 }
 
+type FormData = Awaited<ReturnType<typeof getTransactionFormData>>;
+
+/** Loads what the form needs, then shows the fields; a missing record gets a message instead. */
 function TransactionForm({ transactionId }: { transactionId?: number }) {
+  const styles = useThemedStyles(makeStyles);
+  const { data } = useAsyncData(() => getTransactionFormData(transactionId), [transactionId]);
+
+  if (!data) return <View style={styles.container} />;
+  if (transactionId !== undefined && !data.existing) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.missing}>Запись не найдена — возможно, она уже удалена.</Text>
+      </View>
+    );
+  }
+  // A key per record: the fields start from that record's values, with no effect copying them in
+  // (React, «Resetting all state when a prop changes»: https://react.dev/learn/you-might-not-need-an-effect).
+  return <TransactionFields key={transactionId ?? "new"} data={data} transactionId={transactionId} />;
+}
+
+function TransactionFields({ data, transactionId }: { data: FormData; transactionId?: number }) {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const isEdit = transactionId !== undefined;
-  const { data } = useAsyncData(() => getTransactionFormData(transactionId), [transactionId]);
+  const existing = data.existing;
 
-  const [type, setType] = useState<TransactionType>("expense");
-  const [accountId, setAccountId] = useState<number | null>(null);
-  const [counterpartAccountId, setCounterpartAccountId] = useState<number | null>(null);
-  const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [amountText, setAmountText] = useState("");
-  const [note, setNote] = useState("");
-  const [day, setDay] = useState(() => startOfDay(Date.now()));
+  const [type, setType] = useState<TransactionType>(existing?.type ?? "expense");
+  const [accountId, setAccountId] = useState<number | null>(existing?.accountId ?? null);
+  const [counterpartAccountId, setCounterpartAccountId] = useState<number | null>(existing?.counterpartAccountId ?? null);
+  const [categoryId, setCategoryId] = useState<number | null>(existing?.categoryId ?? null);
+  const [amountText, setAmountText] = useState(existing ? minorUnitsToInput(existing.amount) : "");
+  const [note, setNote] = useState(existing?.note ?? "");
+  const [day, setDay] = useState(() => startOfDay(existing?.occurredAt ?? Date.now()));
   const [saving, setSaving] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fill the form once the transaction being edited has loaded.
-  const existing = data?.existing;
-  useEffect(() => {
-    if (!existing) return;
-    setType(existing.type);
-    setAccountId(existing.accountId);
-    setCounterpartAccountId(existing.counterpartAccountId);
-    setCategoryId(existing.categoryId);
-    setAmountText(minorUnitsToInput(existing.amount));
-    setNote(existing.note ?? "");
-    setDay(startOfDay(existing.occurredAt));
-  }, [existing]);
-
-  const filteredCategories = (data?.categories ?? []).filter(
+  const filteredCategories = data.categories.filter(
     (c) => c.kind === (type === "income" ? "income" : "expense")
   );
 
@@ -90,7 +97,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
     }
     setError(null);
     const { amount, accountId: fromAccountId } = checked.value;
-    const account = data?.accounts.find((a) => a.id === fromAccountId);
+    const account = data.accounts.find((a) => a.id === fromAccountId);
     if (!account) return;
 
     const input = {
@@ -146,14 +153,6 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
     }
   }
 
-  if (isEdit && data && !existing) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.missing}>Запись не найдена — возможно, она уже удалена.</Text>
-      </View>
-    );
-  }
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.sectionTitle}>Тип</Text>
@@ -165,7 +164,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
 
       <Text style={styles.sectionTitle}>Счёт</Text>
       <View style={styles.chipRow}>
-        {(data?.accounts ?? []).map((a) => (
+        {data.accounts.map((a) => (
           <Chip key={a.id} label={a.name} selected={accountId === a.id} onPress={() => handleAccountChange(a.id)} />
         ))}
       </View>
@@ -174,7 +173,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
         <>
           <Text style={styles.sectionTitle}>Куда</Text>
           <View style={styles.chipRow}>
-            {(data?.accounts ?? [])
+            {data.accounts
               .filter((a) => a.id !== accountId)
               .map((a) => (
                 <Chip

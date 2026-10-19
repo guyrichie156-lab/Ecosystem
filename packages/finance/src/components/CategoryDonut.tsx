@@ -39,13 +39,13 @@ export function CategoryDonut({ segments, caption }: { segments: DonutSegment[];
 
   // Angles clockwise from 12 o'clock; each slice gives up GAP px of its arc to the surface.
   const gapAngle = segments.length > 1 ? GAP / R : 0;
+  const slices: { start: number; end: number }[] = [];
   let cursor = 0;
-  const slices = segments.map((s) => {
+  for (const s of segments) {
     const sweep = (s.amount / total) * 2 * Math.PI;
-    const slice = { start: cursor + gapAngle / 2, end: cursor + sweep - gapAngle / 2 };
+    slices.push({ start: cursor + gapAngle / 2, end: cursor + sweep - gapAngle / 2 });
     cursor += sweep;
-    return slice;
-  });
+  }
 
   function onRingPress(e: GestureResponderEvent) {
     const dx = e.nativeEvent.locationX - C;

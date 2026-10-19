@@ -4,10 +4,16 @@
   "private": true,
   "description": "",
   "scripts": {
-    "test": "pnpm -r --if-present test"
+    "test": "tsc -p tsconfig.test.json && pnpm -r --if-present test",
+    "lint": "eslint apps/mobile packages"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~57.0.2",
+    "typescript": "~6.0.3"
+  }
 }

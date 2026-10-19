@@ -14,7 +14,8 @@ const DAY = 24 * 60 * 60 * 1000;
  */
 export function DateField({ value, onChange }: { value: number; onChange: (day: number) => void }) {
   const styles = useThemedStyles(makeStyles);
-  const today = startOfDay(Date.now());
+  // Read once: the form lives for seconds, and a render must not depend on the clock.
+  const [today] = useState(() => startOfDay(Date.now()));
   // Half a day back is always yesterday, also on the days the clocks change (a day of 23 or 25 hours).
   const yesterday = startOfDay(today - DAY / 2);
   const day = startOfDay(value);

@@ -9,7 +9,7 @@ import { checkBudgetForm } from "../lib/validation";
 
 export function BudgetsScreen() {
   const styles = useThemedStyles(makeStyles);
-  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
+  const { data, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const [statuses, expenseCategories] = await Promise.all([
       getBudgetStatuses(),
       getExpenseCategories(),
