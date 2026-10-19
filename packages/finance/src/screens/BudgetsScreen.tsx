@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
+import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { db, budgets as budgetsTable, categories as categoriesTable } from "@ecosystem/db";
 import { eq } from "drizzle-orm";
 import { getBudgetStatuses } from "../lib/balance";
@@ -53,6 +53,9 @@ export function BudgetsScreen() {
       setCategoryId(null);
       setLimitText("");
       refresh();
+    } catch (e) {
+      console.warn("Adding a budget failed:", describeError(e));
+      setError("Не удалось добавить бюджет. Попробуйте ещё раз.");
     } finally {
       setSaving(false);
     }

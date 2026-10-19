@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useTheme, type Theme } from "@ecosystem/core";
+import { describeError, useTheme, type Theme } from "@ecosystem/core";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { db, migrations } from "@ecosystem/db";
 import { appModules } from "../modules";
@@ -14,7 +14,7 @@ async function runForEachModule(step: "prepare" | "onReady") {
       try {
         await module[step]?.();
       } catch (e) {
-        console.error(`Module "${module.id}" failed in ${step}`, e);
+        console.error(`Module "${module.id}" failed in ${step}:`, describeError(e));
       }
     })
   );

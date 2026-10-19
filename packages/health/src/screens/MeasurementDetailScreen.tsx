@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
+import { describeError, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { LineChart } from "../components/LineChart";
 import { KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { deleteMeasurement, getMeasurementSeries, type MeasurementPoint } from "../lib/measurements";
@@ -51,10 +51,18 @@ export function MeasurementDetailScreen({ kind }: { kind: BodyMeasurementKind })
   // Default to the latest point whenever the series changes.
   useEffect(() => setSelected(points.length - 1), [points.length]);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function handleDelete(id: number) {
-    await deleteMeasurement(id);
-    if (points.length === 1) router.back();
-    else refresh();
+    try {
+      await deleteMeasurement(id);
+      setError(null);
+      if (points.length === 1) router.back();
+      else refresh();
+    } catch (e) {
+      console.warn("Deleting a measurement failed:", describeError(e));
+      setError("Не удалось удалить замер. Попробуйте ещё раз.");
+    }
   }
 
   const current = points[selected];
@@ -90,6 +98,7 @@ export function MeasurementDetailScreen({ kind }: { kind: BodyMeasurementKind })
             !loading && <Text style={styles.note}>Для графика нужно хотя бы два замера.</Text>
           )}
           <Text style={styles.sectionTitle}>Все замеры</Text>
+          {error && <Text style={styles.error}>{error}</Text>}
         </View>
       }
       renderItem={({ item }) => <EntryRow kind={kind} point={item} onDelete={handleDelete} />}
@@ -106,6 +115,7 @@ const makeStyles = (t: Theme) =>
     heroCaption: { fontSize: 14, color: t.textMuted, marginTop: 4 },
     note: { fontSize: 14, color: t.textMuted, marginVertical: 12 },
     sectionTitle: { fontSize: 16, fontWeight: "600", color: t.text, marginTop: 20, marginBottom: 4 },
+    error: { fontSize: 14, color: t.danger, marginVertical: 8 },
     row: {
       flexDirection: "row",
       alignItems: "center",

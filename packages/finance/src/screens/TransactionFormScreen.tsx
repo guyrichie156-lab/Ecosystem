@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
-import { TextField, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
+import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
 import { parseMinorUnits } from "../lib/money";
@@ -130,9 +130,12 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       }
       await runAfterTransactionChange({
         categoryId: type === "expense" ? categoryId : null,
-        accountIds: type === "transfer" ? [accountId, counterpartAccountId!] : [accountId],
+        accountIds: input.counterpartAccountId ? [accountId, input.counterpartAccountId] : [accountId],
       });
       router.back();
+    } catch (e) {
+      console.warn("Saving a record failed:", describeError(e));
+      setError("Не удалось сохранить запись. Попробуйте ещё раз.");
     } finally {
       setSaving(false);
     }
@@ -151,6 +154,9 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
       // Deleting only lowers spending or restores a balance, so there is nothing to alert about.
       await runAfterTransactionChange({ categoryId: null, accountIds: [] });
       router.back();
+    } catch (e) {
+      console.warn("Deleting a record failed:", describeError(e));
+      setError("Не удалось удалить запись. Попробуйте ещё раз.");
     } finally {
       setSaving(false);
     }

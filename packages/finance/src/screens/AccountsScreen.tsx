@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
+import { TextField, describeError, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { db, accounts as accountsTable } from "@ecosystem/db";
 import { getAccountBalance } from "../lib/balance";
 import { APP_CURRENCY, formatMinorUnits, parseMinorUnits } from "../lib/money";
@@ -52,6 +52,9 @@ export function AccountsScreen() {
       setName("");
       setInitialBalanceText("");
       refresh();
+    } catch (e) {
+      console.warn("Adding an account failed:", describeError(e));
+      setError("Не удалось добавить счёт. Попробуйте ещё раз.");
     } finally {
       setSaving(false);
     }

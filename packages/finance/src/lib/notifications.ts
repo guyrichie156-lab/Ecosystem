@@ -1,5 +1,6 @@
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
+import { describeError } from "@ecosystem/core";
 import { getActiveAccounts, getAccountBalance, getBudgetStatuses } from "./balance";
 import { formatMinorUnits } from "./money";
 import { updateBalanceWidget } from "../widget/updateWidget";
@@ -80,6 +81,6 @@ export async function runPostTransactionChecks(scope: TransactionScope): Promise
 export async function runAfterTransactionChange(scope: TransactionScope): Promise<void> {
   const results = await Promise.allSettled([updateBalanceWidget(), runPostTransactionChecks(scope)]);
   for (const result of results) {
-    if (result.status === "rejected") console.warn("Step after saving a transaction failed", result.reason);
+    if (result.status === "rejected") console.warn("Step after saving a transaction failed:", describeError(result.reason));
   }
 }

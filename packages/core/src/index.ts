@@ -5,3 +5,4 @@ export * from "./useAsyncData";
 export * from "./TextField";
 export * from "./SegmentedControl";
 export * from "./ticks";
+export * from "./errors";

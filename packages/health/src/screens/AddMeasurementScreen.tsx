@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
+import { TextField, describeError, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { ACTIVE_KINDS, KIND_INFO, labelWithUnit, parseMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { addCheckIn } from "../lib/measurements";
@@ -32,6 +32,9 @@ export function AddMeasurementScreen() {
     try {
       await addCheckIn(values);
       router.back();
+    } catch (e) {
+      console.warn("Saving a check-in failed:", describeError(e));
+      setErrors(["Не удалось сохранить замер. Попробуйте ещё раз."]);
     } finally {
       setSaving(false);
     }

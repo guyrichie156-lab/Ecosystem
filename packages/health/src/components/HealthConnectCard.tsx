@@ -38,6 +38,8 @@ export function HealthConnectCard({ onImported }: { onImported: () => void }) {
       const granted = await requestHealthConnectAccess();
       if (granted) await runImport();
       else setMessage("Доступ не выдан. Разрешения можно изменить в Health Connect.");
+    } catch (e) {
+      setMessage(`Не удалось подключить Health Connect: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setBusy(false);
       refresh();
