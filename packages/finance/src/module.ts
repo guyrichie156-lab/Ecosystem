@@ -1,5 +1,5 @@
 import type { AppModule } from "@ecosystem/core";
-import { ensureNotificationPermission } from "./lib/notifications";
+import { configureNotifications, ensureNotificationPermission } from "./lib/notifications";
 import { seedDefaultCategoriesIfEmpty } from "./seed";
 
 export const financeModule: AppModule = {
@@ -9,6 +9,7 @@ export const financeModule: AppModule = {
   // Categories must exist before the transaction and budget screens load them.
   prepare: seedDefaultCategoriesIfEmpty,
   onReady: async () => {
+    configureNotifications();
     await ensureNotificationPermission();
   },
 };

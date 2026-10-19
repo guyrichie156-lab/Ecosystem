@@ -7,6 +7,9 @@ export const monthOf = (date: Date): Month => ({ year: date.getFullYear(), month
 
 export const addMonths = (m: Month, n: number): Month => monthOf(new Date(m.year, m.month + n, 1));
 
+/** "2026-10": how a month is stored in the database (budgets.start_month). */
+export const monthKey = (m: Month): string => `${m.year}-${String(m.month + 1).padStart(2, "0")}`;
+
 /** Negative if `a` is before `b`, 0 if the same month. */
 export const compareMonths = (a: Month, b: Month): number => a.year - b.year || a.month - b.month;
 

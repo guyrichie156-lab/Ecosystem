@@ -1,24 +1,19 @@
 import React, { useState } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
-import { db, budgets as budgetsTable, categories as categoriesTable } from "@ecosystem/db";
-import { eq } from "drizzle-orm";
 import { getBudgetStatuses } from "../lib/balance";
+import { createBudget } from "../lib/budgets";
+import { getExpenseCategories } from "../lib/categories";
 import { formatMinorUnits } from "../lib/money";
 import { checkBudgetForm } from "../lib/validation";
 import { Chip } from "../components/Chip";
-
-function currentMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
 
 export function BudgetsScreen() {
   const styles = useThemedStyles(makeStyles);
   const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const [statuses, expenseCategories] = await Promise.all([
       getBudgetStatuses(),
-      db.select().from(categoriesTable).where(eq(categoriesTable.kind, "expense")),
+      getExpenseCategories(),
     ]);
     return { statuses, expenseCategories };
   }, []);
@@ -41,12 +36,7 @@ export function BudgetsScreen() {
     setError(null);
     setSaving(true);
     try {
-      await db.insert(budgetsTable).values({
-        categoryId: checked.value.categoryId,
-        amountLimit: checked.value.amountLimit,
-        period: "monthly",
-        startMonth: currentMonth(),
-      });
+      await createBudget(checked.value);
       setCategoryId(null);
       setLimitText("");
       refresh();

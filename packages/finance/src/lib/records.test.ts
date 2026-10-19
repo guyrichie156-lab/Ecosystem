@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { groupByDay, monthlyReport, summarize } from "./records";
-import { addMonths, calendarWeeks, compareMonths, monthBounds, occurredAtFor } from "./period";
+import { addMonths, calendarWeeks, compareMonths, monthBounds, monthKey, occurredAtFor } from "./period";
 
 const at = (y: number, m: number, d: number, h = 12) => new Date(y, m, d, h).getTime();
 const row = (type: "income" | "expense" | "transfer", amount: number, occurredAt: number) => ({ type, amount, occurredAt });
@@ -68,4 +68,8 @@ test("a back-dated record is stored at noon, today's at the current time", () =>
   const now = at(2026, 9, 18, 21);
   assert.equal(occurredAtFor(at(2026, 9, 18, 8), now), now);
   assert.equal(occurredAtFor(at(2026, 7, 2, 8), now), at(2026, 7, 2, 12));
+});
+
+test("a month is stored as YYYY-MM", () => {
+  assert.deepEqual([monthKey({ year: 2026, month: 0 }), monthKey({ year: 2026, month: 9 })], ["2026-01", "2026-10"]);
 });

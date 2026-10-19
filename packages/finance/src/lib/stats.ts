@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { db } from "@ecosystem/db";
 import { bucketByMonth, monthStarts, type CategorySpend, type MonthSpend } from "./chartData";
 import { monthBounds, type Month } from "./period";
+import { activeAccountIds } from "./activeAccounts";
 
 const nextMonthStart = (now: Date) => new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
 
@@ -17,7 +18,7 @@ export async function getMonthByCategory(month: Month, type: "expense" | "income
     WHERE t.type = ${type}
       AND t.occurred_at >= ${start}
       AND t.occurred_at < ${end}
-      AND t.account_id IN (SELECT id FROM accounts WHERE archived_at IS NULL)
+      AND t.account_id IN ${activeAccountIds}
     GROUP BY t.category_id
     ORDER BY amount DESC
   `);
@@ -37,7 +38,7 @@ export async function getMonthlySpend(months = 6, now = new Date()): Promise<Mon
     WHERE type = 'expense'
       AND occurred_at >= ${starts[0]}
       AND occurred_at < ${end}
-      AND account_id IN (SELECT id FROM accounts WHERE archived_at IS NULL)
+      AND account_id IN ${activeAccountIds}
   `);
   return bucketByMonth(rows, starts, end);
 }
@@ -48,6 +49,6 @@ export async function getReportRows() {
     SELECT type, amount, occurred_at AS occurredAt
     FROM transactions
     WHERE type IN ('income', 'expense')
-      AND account_id IN (SELECT id FROM accounts WHERE archived_at IS NULL)
+      AND account_id IN ${activeAccountIds}
   `);
 }

@@ -2,6 +2,7 @@ export * from "./lib/balance";
 export * from "./lib/money";
 export * from "./lib/transactions";
 export * from "./lib/notifications";
+export * from "./lib/afterChange";
 export * from "./screens/FinanceScreen";
 export * from "./screens/TransactionFormScreen";
 export * from "./screens/AccountsScreen";

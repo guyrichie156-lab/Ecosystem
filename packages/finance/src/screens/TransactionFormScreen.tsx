@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
-import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
 import { checkTransactionForm } from "../lib/validation";
-import { runAfterTransactionChange } from "../lib/notifications";
+import { runAfterTransactionChange } from "../lib/afterChange";
 import {
   addTransaction,
   deleteTransaction,
-  getTransaction,
+  getTransactionFormData,
   updateTransaction,
   type TransactionType,
 } from "../lib/transactions";
@@ -40,14 +39,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const isEdit = transactionId !== undefined;
-  const { data } = useAsyncData(async () => {
-    const [accs, cats, existing] = await Promise.all([
-      db.select().from(accountsTable),
-      db.select().from(categoriesTable),
-      isEdit ? getTransaction(transactionId) : Promise.resolve(undefined),
-    ]);
-    return { accounts: accs, categories: cats, existing };
-  }, [transactionId]);
+  const { data } = useAsyncData(() => getTransactionFormData(transactionId), [transactionId]);
 
   const [type, setType] = useState<TransactionType>("expense");
   const [accountId, setAccountId] = useState<number | null>(null);

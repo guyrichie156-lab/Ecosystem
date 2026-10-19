@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { db, accounts, categories, budgets } from "@ecosystem/db";
+import { activeAccountIds } from "./activeAccounts";
 
 function currentMonthStartMillis(): number {
   const now = new Date();
@@ -52,13 +53,13 @@ export async function getTotalBalance(): Promise<number> {
             END
           )
           FROM transactions
-          WHERE account_id IN (SELECT id FROM accounts WHERE archived_at IS NULL)
+          WHERE account_id IN ${activeAccountIds}
         ), 0)
       + COALESCE((
           SELECT SUM(amount)
           FROM transactions
           WHERE type = 'transfer'
-            AND counterpart_account_id IN (SELECT id FROM accounts WHERE archived_at IS NULL)
+            AND counterpart_account_id IN ${activeAccountIds}
         ), 0)
       AS total
   `);
@@ -72,7 +73,7 @@ export async function getThisMonthSpend(): Promise<number> {
     FROM transactions
     WHERE type = 'expense'
       AND occurred_at >= ${currentMonthStartMillis()}
-      AND account_id IN (SELECT id FROM accounts WHERE archived_at IS NULL)
+      AND account_id IN ${activeAccountIds}
   `);
   return row?.total ?? 0;
 }
@@ -104,6 +105,7 @@ export async function getBudgetStatuses(): Promise<BudgetStatus[]> {
       SELECT COALESCE(SUM(amount), 0) AS total
       FROM transactions
       WHERE type = 'expense' AND category_id = ${b.categoryId} AND occurred_at >= ${monthStart}
+        AND account_id IN ${activeAccountIds}
     `);
     results.push({ ...b, spent: spentRow?.total ?? 0 });
   }

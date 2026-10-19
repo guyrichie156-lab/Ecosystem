@@ -1,6 +1,8 @@
-import { and, desc, eq, gte, lt } from "drizzle-orm";
+import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { db, accounts, categories, transactions } from "@ecosystem/db";
+import { activeAccountIds } from "./activeAccounts";
+import { getActiveAccounts } from "./balance";
 
 export type TransactionType = "income" | "expense" | "transfer";
 
@@ -37,11 +39,21 @@ export async function getTransactionsBetween(start: number, end: number) {
     .innerJoin(accounts, eq(accounts.id, transactions.accountId))
     .leftJoin(counterpart, eq(counterpart.id, transactions.counterpartAccountId))
     .leftJoin(categories, eq(categories.id, transactions.categoryId))
-    .where(and(gte(transactions.occurredAt, start), lt(transactions.occurredAt, end)))
+    .where(and(gte(transactions.occurredAt, start), lt(transactions.occurredAt, end), sql`${transactions.accountId} IN ${activeAccountIds}`))
     .orderBy(desc(transactions.occurredAt), desc(transactions.id));
 }
 
 export type TransactionListItem = Awaited<ReturnType<typeof getTransactionsBetween>>[number];
+
+/** What the record form needs: the accounts to choose from, all categories and, when editing, the record. */
+export async function getTransactionFormData(transactionId?: number) {
+  const [accountRows, categoryRows, existing] = await Promise.all([
+    getActiveAccounts(),
+    db.select().from(categories),
+    transactionId === undefined ? Promise.resolve(undefined) : getTransaction(transactionId),
+  ]);
+  return { accounts: accountRows, categories: categoryRows, existing };
+}
 
 export async function getTransaction(id: number) {
   const rows = await db.select().from(transactions).where(eq(transactions.id, id));

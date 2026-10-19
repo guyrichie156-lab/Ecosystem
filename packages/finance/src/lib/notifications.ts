@@ -1,19 +1,20 @@
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
-import { describeError } from "@ecosystem/core";
 import { getActiveAccounts, getAccountBalance, getBudgetStatuses } from "./balance";
 import { formatMinorUnits } from "./money";
-import { updateBalanceWidget } from "../widget/updateWidget";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+/** Shows the budget and balance alerts while the app is open too. Called once from `financeModule.onReady`. */
+export function configureNotifications(): void {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 export async function ensureNotificationPermission(): Promise<boolean> {
   const current = await Notifications.getPermissionsAsync();
@@ -71,16 +72,5 @@ export async function runPostTransactionChecks(scope: TransactionScope): Promise
         `«${account.name}»: ${formatMinorUnits(balance, account.currency)}`
       );
     }
-  }
-}
-
-/**
- * Widget refresh and alerts after a transaction is added, changed or deleted. These are extras:
- * a failure here is logged and never stops the save itself.
- */
-export async function runAfterTransactionChange(scope: TransactionScope): Promise<void> {
-  const results = await Promise.allSettled([updateBalanceWidget(), runPostTransactionChecks(scope)]);
-  for (const result of results) {
-    if (result.status === "rejected") console.warn("Step after saving a transaction failed:", describeError(result.reason));
   }
 }

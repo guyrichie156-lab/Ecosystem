@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { TextField, describeError, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
-import { db, accounts as accountsTable } from "@ecosystem/db";
-import { getAccountBalance } from "../lib/balance";
-import { APP_CURRENCY, formatMinorUnits } from "../lib/money";
+import { createAccount, getAccountsWithBalances, type AccountType } from "../lib/accounts";
+import { runAfterAccountChange } from "../lib/afterChange";
+import { formatMinorUnits } from "../lib/money";
 import { checkAccountForm } from "../lib/validation";
 import { Chip } from "../components/Chip";
-
-type AccountType = "cash" | "bank" | "card" | "savings";
 
 function labelForAccountType(t: AccountType) {
   if (t === "cash") return "Наличные";
@@ -18,10 +16,7 @@ function labelForAccountType(t: AccountType) {
 
 export function AccountsScreen() {
   const styles = useThemedStyles(makeStyles);
-  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
-    const accs = await db.select().from(accountsTable);
-    return Promise.all(accs.map(async (a) => ({ ...a, balance: await getAccountBalance(a.id) })));
-  }, []);
+  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(getAccountsWithBalances, []);
   useRefreshOnFocus(refresh);
 
   const [name, setName] = useState("");
@@ -39,12 +34,8 @@ export function AccountsScreen() {
     setError(null);
     setSaving(true);
     try {
-      await db.insert(accountsTable).values({
-        name: checked.value.name,
-        type,
-        currency: APP_CURRENCY,
-        initialBalance: checked.value.initialBalance,
-      });
+      await createAccount({ ...checked.value, type });
+      await runAfterAccountChange();
       setName("");
       setInitialBalanceText("");
       refresh();
