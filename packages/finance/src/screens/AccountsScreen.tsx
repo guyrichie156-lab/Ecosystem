@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
+import { TextField, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { db, accounts as accountsTable } from "@ecosystem/db";
-import { useAsyncData } from "../hooks/useAsyncData";
-import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
 import { getAccountBalance } from "../lib/balance";
 import { APP_CURRENCY, formatMinorUnits, parseMinorUnits } from "../lib/money";
 import { Chip } from "../components/Chip";
@@ -19,7 +17,7 @@ function labelForAccountType(t: AccountType) {
 
 export function AccountsScreen() {
   const styles = useThemedStyles(makeStyles);
-  const { data, loading, refresh } = useAsyncData(async () => {
+  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const accs = await db.select().from(accountsTable);
     return Promise.all(accs.map(async (a) => ({ ...a, balance: await getAccountBalance(a.id) })));
   }, []);
@@ -64,7 +62,7 @@ export function AccountsScreen() {
       <FlatList
         data={data ?? []}
         keyExtractor={(item) => String(item.id)}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={pullToRefresh} />}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <Text style={styles.rowTitle}>{item.name}</Text>

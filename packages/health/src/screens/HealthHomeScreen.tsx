@@ -39,7 +39,7 @@ function ZoneRow({
 export function HealthHomeScreen() {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
-  const { data, loading, refresh } = useAsyncData(async () => {
+  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const [latest, weightSeries] = await Promise.all([getLatestMeasurements(), getMeasurementSeries("weight")]);
     const profile = getHealthProfile();
     return { latest, profile, tips: getHealthTips({ latest, weightSeries, profile }) };
@@ -66,7 +66,7 @@ export function HealthHomeScreen() {
       contentContainerStyle={styles.content}
       data={ACTIVE_KINDS}
       keyExtractor={(kind) => kind}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={pullToRefresh} />}
       ListHeaderComponent={
         <View>
           <Text style={styles.subtitle}>

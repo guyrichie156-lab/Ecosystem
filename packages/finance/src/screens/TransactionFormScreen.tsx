@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
-import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
+import { TextField, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { db, accounts as accountsTable, categories as categoriesTable } from "@ecosystem/db";
-import { useAsyncData } from "../hooks/useAsyncData";
 import { parseMinorUnits } from "../lib/money";
 import { runAfterTransactionChange } from "../lib/notifications";
 import {

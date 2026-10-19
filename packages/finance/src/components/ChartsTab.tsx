@@ -17,7 +17,7 @@ export function ChartsTab({ month, onMonthChange }: { month: Month; onMonthChang
   const [kind, setKind] = useState<Kind>("expense");
   // As many coloured slices as the palette has colours (the same five in both themes).
   const colours = useTheme().chart.slots.length;
-  const { data, loading, refresh } = useAsyncData(
+  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(
     () => getMonthByCategory(month, kind).then((rows) => foldCategories(rows, colours)),
     [month.year, month.month, kind]
   );
@@ -30,7 +30,7 @@ export function ChartsTab({ month, onMonthChange }: { month: Month; onMonthChang
     <ScrollView
       style={styles.list}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={pullToRefresh} />}
     >
       <SegmentedControl
         options={[

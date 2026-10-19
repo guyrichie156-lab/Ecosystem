@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
+import { TextField, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { db, budgets as budgetsTable, categories as categoriesTable } from "@ecosystem/db";
 import { eq } from "drizzle-orm";
-import { useAsyncData } from "../hooks/useAsyncData";
 import { getBudgetStatuses } from "../lib/balance";
 import { formatMinorUnits, parseMinorUnits } from "../lib/money";
 import { Chip } from "../components/Chip";
@@ -15,7 +14,7 @@ function currentMonth(): string {
 
 export function BudgetsScreen() {
   const styles = useThemedStyles(makeStyles);
-  const { data, loading, refresh } = useAsyncData(async () => {
+  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const [statuses, expenseCategories] = await Promise.all([
       getBudgetStatuses(),
       db.select().from(categoriesTable).where(eq(categoriesTable.kind, "expense")),
@@ -64,7 +63,7 @@ export function BudgetsScreen() {
       <FlatList
         data={data?.statuses ?? []}
         keyExtractor={(item) => String(item.id)}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={pullToRefresh} />}
         renderItem={({ item }) => {
           const pct = item.amountLimit > 0 ? Math.min(1, item.spent / item.amountLimit) : 0;
           const over = item.spent > item.amountLimit;

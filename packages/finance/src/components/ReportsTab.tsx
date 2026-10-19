@@ -13,7 +13,7 @@ const monthShort = new Intl.DateTimeFormat("ru-RU", { month: "short" });
 /** «Отчёты»: the overall balance, accounts, expenses by month and the month-by-month table. */
 export function ReportsTab() {
   const styles = useThemedStyles(makeStyles);
-  const { data, loading, refresh } = useAsyncData(async () => {
+  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const [balance, accounts, rows, monthly] = await Promise.all([
       getTotalBalance(),
       getActiveAccounts(),
@@ -29,7 +29,7 @@ export function ReportsTab() {
     <ScrollView
       style={styles.list}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={pullToRefresh} />}
     >
       <Text style={styles.heroLabel}>Общий баланс</Text>
       <Text style={styles.hero} numberOfLines={1} adjustsFontSizeToFit>

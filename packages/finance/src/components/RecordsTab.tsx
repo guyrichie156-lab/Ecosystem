@@ -48,7 +48,7 @@ const Row = React.memo(function Row({ item, onPress }: { item: TransactionListIt
 export function RecordsTab({ month, onMonthChange }: { month: Month; onMonthChange: (month: Month) => void }) {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
-  const { data, loading, refresh } = useAsyncData(() => {
+  const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(() => {
     const { start, end } = monthBounds(month);
     return getTransactionsBetween(start, end);
   }, [month.year, month.month]);
@@ -66,7 +66,7 @@ export function RecordsTab({ month, onMonthChange }: { month: Month; onMonthChan
       contentContainerStyle={styles.content}
       sections={sections}
       keyExtractor={(item) => String(item.id)}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={pullToRefresh} />}
       stickySectionHeadersEnabled={false}
       ListHeaderComponent={
         <View>
