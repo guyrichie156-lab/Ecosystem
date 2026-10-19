@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { TextField, describeError, useThemedStyles, type Theme } from "@ecosystem/core";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { PrimaryButton, TextField, describeError, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { ACTIVE_KINDS, KIND_INFO, labelWithUnit, parseMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { addCheckIn } from "../lib/measurements";
@@ -60,9 +60,7 @@ export function AddMeasurementScreen() {
           {e}
         </Text>
       ))}
-      <Pressable style={styles.saveButton} onPress={handleSave} disabled={saving}>
-        <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Сохранить"}</Text>
-      </Pressable>
+      <PrimaryButton label="Сохранить" busy={saving} onPress={handleSave} style={styles.saveButton} />
     </ScrollView>
   );
 }
@@ -75,12 +73,5 @@ const makeStyles = (t: Theme) =>
     field: { marginTop: 14 },
     label: { fontSize: 15, fontWeight: "600", color: t.text, marginBottom: 6 },
     error: { color: t.danger, fontSize: 14, marginTop: 12 },
-    saveButton: {
-      backgroundColor: t.primary,
-      borderRadius: 12,
-      paddingVertical: 14,
-      alignItems: "center",
-      marginTop: 28,
-    },
-    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    saveButton: { marginTop: 28 },
   });

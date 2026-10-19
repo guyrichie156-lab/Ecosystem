@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { FlatList, Platform, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField, describeError, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
+import { FlatList, Platform, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Chip, PrimaryButton, TextField, describeError, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { createAccount, getAccountsWithBalances, type AccountType } from "../lib/accounts";
 import { runAfterAccountChange } from "../lib/afterChange";
 import { formatMinorUnits } from "../lib/money";
 import { checkAccountForm } from "../lib/validation";
-import { Chip } from "../components/Chip";
 
 function labelForAccountType(t: AccountType) {
   if (t === "cash") return "Наличные";
@@ -79,9 +78,7 @@ export function AccountsScreen() {
           onChangeText={setInitialBalanceText}
         />
         {error && <Text style={styles.error}>{error}</Text>}
-        <Pressable style={styles.saveButton} onPress={handleCreate} disabled={saving}>
-          <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Добавить счёт"}</Text>
-        </Pressable>
+        <PrimaryButton label="Добавить счёт" busy={saving} onPress={handleCreate} />
       </View>
     </View>
   );
@@ -104,7 +101,5 @@ const makeStyles = (t: Theme) =>
     sectionTitle: { fontSize: 14, fontWeight: "600", color: t.text, marginBottom: 8 },
     chipRow: { flexDirection: "row", flexWrap: "wrap" },
     field: { marginBottom: 10 },
-    saveButton: { backgroundColor: t.primary, borderRadius: 12, paddingVertical: 14, alignItems: "center" },
-    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
     error: { color: t.danger, fontSize: 14, marginBottom: 10 },
   });

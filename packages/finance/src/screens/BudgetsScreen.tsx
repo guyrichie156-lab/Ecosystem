@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
+import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Chip, PrimaryButton, TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { getBudgetStatuses } from "../lib/balance";
 import { createBudget } from "../lib/budgets";
 import { getExpenseCategories } from "../lib/categories";
 import { formatMinorUnits } from "../lib/money";
 import { checkBudgetForm } from "../lib/validation";
-import { Chip } from "../components/Chip";
 
 export function BudgetsScreen() {
   const styles = useThemedStyles(makeStyles);
@@ -95,9 +94,7 @@ export function BudgetsScreen() {
           onChangeText={setLimitText}
         />
         {error && <Text style={styles.error}>{error}</Text>}
-        <Pressable style={styles.saveButton} onPress={handleCreate} disabled={saving}>
-          <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Добавить бюджет"}</Text>
-        </Pressable>
+        <PrimaryButton label="Добавить бюджет" busy={saving} onPress={handleCreate} />
       </View>
     </View>
   );
@@ -119,7 +116,5 @@ const makeStyles = (t: Theme) =>
     sectionTitle: { fontSize: 14, fontWeight: "600", color: t.text, marginBottom: 8 },
     chipRow: { flexDirection: "row", flexWrap: "wrap" },
     field: { marginBottom: 10 },
-    saveButton: { backgroundColor: t.primary, borderRadius: 12, paddingVertical: 14, alignItems: "center" },
-    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
     error: { color: t.danger, fontSize: 14, marginBottom: 10 },
   });

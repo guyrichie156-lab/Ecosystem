@@ -6,3 +6,5 @@ export * from "./TextField";
 export * from "./SegmentedControl";
 export * from "./ticks";
 export * from "./errors";
+export * from "./Chip";
+export * from "./PrimaryButton";

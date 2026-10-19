@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { useThemedStyles, type Theme } from "@ecosystem/core";
+import { Chip, useThemedStyles, type Theme } from "@ecosystem/core";
 import { addMonths, calendarWeeks, compareMonths, monthOf, startOfDay, type Month } from "../lib/period";
-import { Chip } from "./Chip";
 
 const dayFormat = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" });
 const monthFormat = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" });

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
+import { PrimaryButton, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { ACTIVE_KINDS, KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { getLatestMeasurements, getMeasurementSeries, type LatestMeasurement } from "../lib/measurements";
 import { getHealthProfile } from "../lib/profile";
@@ -77,9 +77,7 @@ export function HealthHomeScreen() {
                 : "Замеров пока нет — внесите первый."}
           </Text>
           <Link href="/health/add" asChild>
-            <Pressable style={styles.addButton}>
-              <Text style={styles.addButtonText}>+ Новый замер</Text>
-            </Pressable>
+            <PrimaryButton label="+ Новый замер" style={styles.addButton} />
           </Link>
           <Link href="/health/profile" asChild>
             <Pressable style={styles.profileRow}>
@@ -116,15 +114,7 @@ const makeStyles = (t: Theme) =>
     container: { flex: 1, backgroundColor: t.background },
     content: { padding: 20, paddingBottom: 40 },
     subtitle: { fontSize: 14, color: t.textMuted, marginTop: 8 },
-    addButton: {
-      backgroundColor: t.primary,
-      borderRadius: 12,
-      paddingVertical: 14,
-      alignItems: "center",
-      marginTop: 16,
-      marginBottom: 12,
-    },
-    addButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    addButton: { marginTop: 16, marginBottom: 12 },
     profileRow: {
       flexDirection: "row",
       justifyContent: "space-between",

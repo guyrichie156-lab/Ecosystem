@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { TextField, useThemedStyles, type Theme } from "@ecosystem/core";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Chip, PrimaryButton, TextField, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { getHealthProfile, saveHealthProfile, type Sex } from "../lib/profile";
 
@@ -49,19 +49,11 @@ export function HealthProfileScreen() {
       <Text style={styles.label}>Пол</Text>
       <View style={styles.chipRow}>
         {SEX_OPTIONS.map((o) => (
-          <Pressable
-            key={o.label}
-            style={[styles.chip, sex === o.value && styles.chipSelected]}
-            onPress={() => setSex(o.value)}
-          >
-            <Text style={[styles.chipText, sex === o.value && styles.chipTextSelected]}>{o.label}</Text>
-          </Pressable>
+          <Chip key={o.label} label={o.label} selected={sex === o.value} onPress={() => setSex(o.value)} />
         ))}
       </View>
       {error && <Text style={styles.error}>{error}</Text>}
-      <Pressable style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Сохранить</Text>
-      </Pressable>
+      <PrimaryButton label="Сохранить" onPress={handleSave} style={styles.saveButton} />
     </ScrollView>
   );
 }
@@ -73,24 +65,6 @@ const makeStyles = (t: Theme) =>
     hint: { fontSize: 14, color: t.textMuted, marginBottom: 8 },
     label: { fontSize: 14, fontWeight: "600", color: t.text, marginTop: 16, marginBottom: 8 },
     chipRow: { flexDirection: "row", flexWrap: "wrap" },
-    chip: {
-      paddingVertical: 8,
-      paddingHorizontal: 14,
-      borderRadius: 20,
-      backgroundColor: t.fill,
-      marginRight: 8,
-      marginBottom: 8,
-    },
-    chipSelected: { backgroundColor: t.primary },
-    chipText: { fontSize: 14, color: t.text },
-    chipTextSelected: { color: t.onPrimary },
     error: { color: t.danger, fontSize: 14, marginTop: 12 },
-    saveButton: {
-      backgroundColor: t.primary,
-      borderRadius: 12,
-      paddingVertical: 14,
-      alignItems: "center",
-      marginTop: 28,
-    },
-    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    saveButton: { marginTop: 28 },
   });

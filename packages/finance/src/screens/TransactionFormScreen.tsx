@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
-import { TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
+import { Chip, PrimaryButton, TextField, describeError, useAsyncData, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
 import { checkTransactionForm } from "../lib/validation";
 import { runAfterTransactionChange } from "../lib/afterChange";
@@ -11,7 +11,6 @@ import {
   updateTransaction,
   type TransactionType,
 } from "../lib/transactions";
-import { Chip } from "../components/Chip";
 import { DateField } from "../components/DateField";
 import { occurredAtFor, startOfDay } from "../lib/period";
 
@@ -221,9 +220,7 @@ function TransactionForm({ transactionId }: { transactionId?: number }) {
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <Pressable style={styles.saveButton} onPress={handleSave} disabled={saving}>
-        <Text style={styles.saveButtonText}>{saving ? "Сохранение…" : "Сохранить"}</Text>
-      </Pressable>
+      <PrimaryButton label="Сохранить" busy={saving} onPress={handleSave} style={styles.saveButton} />
 
       {isEdit && (
         <Pressable style={styles.deleteButton} onPress={handleDelete} disabled={saving}>
@@ -242,14 +239,7 @@ const makeStyles = (t: Theme) =>
     content: { padding: 20, paddingBottom: 40 },
     sectionTitle: { fontSize: 14, fontWeight: "600", color: t.text, marginTop: 16, marginBottom: 8 },
     chipRow: { flexDirection: "row", flexWrap: "wrap" },
-    saveButton: {
-      backgroundColor: t.primary,
-      borderRadius: 12,
-      paddingVertical: 14,
-      alignItems: "center",
-      marginTop: 28,
-    },
-    saveButtonText: { color: t.onPrimary, fontWeight: "700", fontSize: 16 },
+    saveButton: { marginTop: 28 },
     deleteButton: {
       borderRadius: 12,
       paddingVertical: 14,
