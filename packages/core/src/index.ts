@@ -8,3 +8,4 @@ export * from "./ticks";
 export * from "./errors";
 export * from "./Chip";
 export * from "./PrimaryButton";
+export * from "./FloatingAddButton";

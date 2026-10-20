@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SegmentedControl, useAsyncData, useRefreshOnFocus, useTheme, useThemedStyles, type Theme } from "@ecosystem/core";
+import {
+  FLOATING_BUTTON_CLEARANCE,
+  SegmentedControl,
+  useAsyncData,
+  useRefreshOnFocus,
+  useTheme,
+  useThemedStyles,
+  type Theme,
+} from "@ecosystem/core";
 import { foldCategories } from "../lib/chartData";
 import { getMonthByCategory } from "../lib/stats";
 import { type Month } from "../lib/period";
 import { CategoryDonut } from "./CategoryDonut";
-import { FAB_CLEARANCE } from "./layout";
 import { MonthSwitcher } from "./MonthSwitcher";
 
 type Kind = "expense" | "income";
@@ -59,7 +66,7 @@ export function ChartsTab({ month, onMonthChange }: { month: Month; onMonthChang
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
     list: { flex: 1 },
-    content: { paddingHorizontal: 20, paddingBottom: FAB_CLEARANCE },
+    content: { paddingHorizontal: 20, paddingBottom: FLOATING_BUTTON_CLEARANCE },
     month: { marginTop: 8, marginBottom: 8 },
     empty: { fontSize: 15, color: t.textMuted, marginTop: 28, textAlign: "center" },
   });

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Link, Stack } from "expo-router";
-import { SegmentedControl, useThemedStyles, type Theme } from "@ecosystem/core";
+import { FloatingAddButton, SegmentedControl, useThemedStyles, type Theme } from "@ecosystem/core";
 import { monthOf, type Month } from "../lib/period";
 import { ChartsTab } from "../components/ChartsTab";
 import { RecordsTab } from "../components/RecordsTab";
@@ -47,9 +47,7 @@ export function FinanceScreen() {
       {tab === "charts" && <ChartsTab month={month} onMonthChange={setMonth} />}
       {tab === "reports" && <ReportsTab />}
       <Link href="/finance/add-transaction" asChild>
-        <Pressable style={styles.fab} accessibilityRole="button" accessibilityLabel="Новая запись">
-          <Text style={styles.fabText}>+</Text>
-        </Pressable>
+        <FloatingAddButton label="Новая запись" />
       </Link>
     </View>
   );
@@ -61,21 +59,4 @@ const makeStyles = (t: Theme) =>
     tabs: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
     headerButton: { paddingHorizontal: 16 },
     headerLink: { fontSize: 16, color: t.link },
-    fab: {
-      position: "absolute",
-      right: 20,
-      bottom: 24,
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: t.accent,
-      alignItems: "center",
-      justifyContent: "center",
-      elevation: 4,
-      shadowColor: "#000",
-      shadowOpacity: 0.2,
-      shadowRadius: 6,
-      shadowOffset: { width: 0, height: 3 },
-    },
-    fabText: { fontSize: 34, lineHeight: 38, color: t.onAccent, fontWeight: "400" },
   });

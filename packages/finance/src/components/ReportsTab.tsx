@@ -1,14 +1,13 @@
 import React from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
+import { FLOATING_BUTTON_CLEARANCE, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { getAccountBalance, getActiveAccounts, getTotalBalance } from "../lib/balance";
 import { APP_CURRENCY, formatAmount, formatMinorUnits } from "../lib/money";
 import { monthlyReport, summarize } from "../lib/records";
 import { getMonthlySpend, getReportRows } from "../lib/stats";
 import { monthShortFormat as monthShort } from "../lib/format";
 import { MonthlyBars } from "./MonthlyBars";
-import { FAB_CLEARANCE } from "./layout";
 
 /** «Отчёты»: the overall balance, accounts, expenses by month and the month-by-month table. */
 export function ReportsTab() {
@@ -101,7 +100,7 @@ export function ReportsTab() {
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
     list: { flex: 1 },
-    content: { paddingHorizontal: 20, paddingBottom: FAB_CLEARANCE },
+    content: { paddingHorizontal: 20, paddingBottom: FLOATING_BUTTON_CLEARANCE },
     heroLabel: { fontSize: 15, color: t.textMuted, textAlign: "center", marginTop: 8 },
     hero: { fontSize: 36, fontWeight: "700", color: t.text, textAlign: "center", marginTop: 4 },
     totals: { flexDirection: "row", backgroundColor: t.card, borderRadius: 14, paddingVertical: 12, marginTop: 16 },

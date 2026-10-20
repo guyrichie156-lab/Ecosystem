@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo } from "react";
 import { Pressable, RefreshControl, SectionList, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
+import { FLOATING_BUTTON_CLEARANCE, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { formatMinorUnits } from "../lib/money";
 import { addMonths, monthBounds, type Month } from "../lib/period";
 import { groupByDay, summarize } from "../lib/records";
 import { getTransactionsBetween, type TransactionListItem } from "../lib/transactions";
 import { CategoryIcon } from "./CategoryIcon";
-import { FAB_CLEARANCE } from "./layout";
 import { MonthSwitcher, formatMonth } from "./MonthSwitcher";
 
 const dayFormat = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
@@ -118,7 +117,7 @@ export function RecordsTab({ month, onMonthChange }: { month: Month; onMonthChan
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
     list: { flex: 1 },
-    content: { paddingHorizontal: 20, paddingBottom: FAB_CLEARANCE },
+    content: { paddingHorizontal: 20, paddingBottom: FLOATING_BUTTON_CLEARANCE },
     totals: { flexDirection: "row", backgroundColor: t.card, borderRadius: 14, paddingVertical: 12, marginTop: 4 },
     total: { flex: 1, alignItems: "center", paddingHorizontal: 4 },
     totalLabel: { fontSize: 13, color: t.textMuted },
