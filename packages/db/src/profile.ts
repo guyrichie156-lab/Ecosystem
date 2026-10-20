@@ -41,6 +41,11 @@ export function saveProfile(profile: Profile): void {
   }
 }
 
+/** Saves a weigh-in made now (Food asks for weight when there is none yet). */
+export async function saveWeighIn(grams: number): Promise<void> {
+  await db.insert(bodyMeasurements).values({ kind: "weight", value: grams, measuredAt: Date.now() });
+}
+
 /** The most recent weigh-in, in grams, or null if there is none. */
 export async function getLatestWeightGrams(): Promise<number | null> {
   const [row] = await db

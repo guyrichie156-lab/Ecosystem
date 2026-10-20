@@ -148,6 +148,50 @@ export const workoutSets = sqliteTable(
   ]
 );
 
+// Food. Amounts per 100 g are integers: kcal, and protein, fat and carbohydrates in tenths of a gram.
+
+export const foods = sqliteTable(
+  "foods",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    brand: text("brand"),
+    // EAN/UPC from the package; unique, so a scanned product is stored once.
+    barcode: text("barcode"),
+    // "base": the app's built-in list, "off": Open Food Facts, "custom": typed in by the user.
+    source: text("source", { enum: ["base", "off", "custom"] }).notNull(),
+    // Id of a built-in food, so the list can be added again without duplicates.
+    baseKey: text("base_key"),
+    kcal: integer("kcal").notNull(),
+    protein: integer("protein").notNull(),
+    fat: integer("fat").notNull(),
+    carbs: integer("carbs").notNull(),
+    createdAt: integer("created_at")
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [uniqueIndex("foods_barcode").on(t.barcode), uniqueIndex("foods_base_key").on(t.baseKey)]
+);
+
+/** What was eaten: the portion's own kcal and macros are kept, so editing the food doesn't rewrite history. */
+export const foodEntries = sqliteTable(
+  "food_entries",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    foodId: integer("food_id")
+      .notNull()
+      .references(() => foods.id),
+    grams: integer("grams").notNull(),
+    meal: text("meal", { enum: ["breakfast", "lunch", "dinner", "snack"] }).notNull(),
+    eatenAt: integer("eaten_at").notNull(),
+    kcal: integer("kcal").notNull(),
+    protein: integer("protein").notNull(),
+    fat: integer("fat").notNull(),
+    carbs: integer("carbs").notNull(),
+  },
+  (t) => [index("food_entries_eaten_at").on(t.eatenAt)]
+);
+
 export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions, { relationName: "accountTransactions" }),
 }));

@@ -50,6 +50,13 @@
       "when": 1792502071422,
       "tag": "0006_overrated_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1792503474258,
+      "tag": "0007_magical_sway",
+      "breakpoints": true
     }
   ]
 }
