@@ -62,6 +62,14 @@
         }
       ],
       "./plugins/withAndroidWorkManagerFix",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Камера нужна, чтобы сканировать штрих-коды продуктов.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ],
       "react-native-health-connect",
       [
         "expo-build-properties",

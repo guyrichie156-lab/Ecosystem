@@ -1,0 +1,24 @@
+{
+  "name": "@ecosystem/food",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@ecosystem/core": "workspace:*",
+    "@ecosystem/db": "workspace:*",
+    "drizzle-orm": "*",
+    "expo-camera": "~57.0.3",
+    "expo-router": "*",
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "tsx": "*",
+    "typescript": "*"
+  },
+  "scripts": {
+    "test": "tsx --test src/lib/*.test.ts"
+  }
+}
