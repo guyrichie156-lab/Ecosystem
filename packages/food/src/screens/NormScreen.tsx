@@ -23,6 +23,8 @@ function Form({ initialWeightGrams }: { initialWeightGrams: number | null }) {
   const [level, setLevel] = useState<ActivityLevel>(getActivityLevel);
   const [manualText, setManualText] = useState(() => String(getManualGoal() ?? ""));
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
+  // The weight last stored; a new weigh-in is saved only when the field differs from it.
+  const [storedWeight, setStoredWeight] = useState(initialWeightGrams);
 
   const weightGrams = parseAmount(weightText, 400, 1000);
   const heightMm = parseAmount(heightText, 250, 10);
@@ -34,7 +36,7 @@ function Form({ initialWeightGrams }: { initialWeightGrams: number | null }) {
   const factor = activityFactor(level);
   const formula = resting === null ? null : Math.round(resting * factor);
 
-  function handleSave() {
+  async function handleSave() {
     const manual = parseAmount(manualText, 10000);
     if (manual === undefined || (manual !== null && manual < 500)) {
       setMessage({ error: true, text: "Своя норма: число от 500 до 10 000 ккал, или оставьте пустым." });
@@ -58,7 +60,10 @@ function Form({ initialWeightGrams }: { initialWeightGrams: number | null }) {
         sex,
         birthYear: age === null ? null : (birthYear as number),
       });
-      if (typeof weightGrams === "number" && weightGrams !== initialWeightGrams) void saveWeighIn(weightGrams);
+      if (typeof weightGrams === "number" && weightGrams !== storedWeight) {
+        await saveWeighIn(weightGrams);
+        setStoredWeight(weightGrams);
+      }
       saveActivityLevel(level);
       saveManualGoal(manual);
       setMessage({ error: false, text: "Сохранено" });

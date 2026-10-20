@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { PrimaryButton, TextField, describeError, useThemedStyles, type Theme } from "@ecosystem/core";
-import { saveFood } from "../lib/foods";
+import { findFoodByBarcode, saveFood } from "../lib/foods";
 import { parseAmount } from "../lib/nutrition";
 
 export type CustomFoodPrefill = {
@@ -60,7 +60,9 @@ export function CustomFoodScreen({ prefill, query }: { prefill: CustomFoodPrefil
     setError(null);
     setSaving(true);
     try {
-      const id = await saveFood({
+      // A barcode is stored once: if this one was saved meanwhile, its food is used.
+      const existing = prefill.barcode ? await findFoodByBarcode(prefill.barcode) : null;
+      const id = existing ? existing.id : await saveFood({
         name: name.trim(),
         brand: brand.trim() || null,
         barcode: prefill.barcode ?? null,
