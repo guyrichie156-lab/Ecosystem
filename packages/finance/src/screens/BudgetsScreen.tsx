@@ -4,7 +4,7 @@ import { Chip, PrimaryButton, TextField, describeError, useAsyncData, useThemedS
 import { getBudgetStatuses } from "../lib/balance";
 import { createBudget } from "../lib/budgets";
 import { getExpenseCategories } from "../lib/categories";
-import { formatMinorUnits } from "../lib/money";
+import { APP_CURRENCY, formatMinorUnits } from "../lib/money";
 import { checkBudgetForm } from "../lib/validation";
 
 export function BudgetsScreen() {
@@ -76,7 +76,18 @@ export function BudgetsScreen() {
             </View>
           );
         }}
-        ListEmptyComponent={<Text style={styles.empty}>Бюджетов пока нет</Text>}
+        // The user asked what «Бюджеты» means; the facts below are what lib/balance.ts and lib/notifications.ts do.
+        ListHeaderComponent={
+          <View style={styles.about}>
+            <Text style={styles.aboutTitle}>Что такое бюджет</Text>
+            <Text style={styles.aboutText}>
+              Лимит расходов на месяц для одной категории, например «Продукты — 600 {APP_CURRENCY}». Ниже видно,
+              сколько уже потрачено с 1-го числа. Когда потрачено 90 % и когда лимит превышен, телефон покажет
+              уведомление. С нового месяца счёт начинается заново.
+            </Text>
+          </View>
+        }
+        ListEmptyComponent={<Text style={styles.empty}>Бюджетов пока нет — добавьте первый ниже.</Text>}
       />
 
       <View style={styles.form}>
@@ -88,7 +99,7 @@ export function BudgetsScreen() {
         </View>
         <TextField
           style={styles.field}
-          placeholder="Лимит, 0,00"
+          placeholder="Лимит на месяц, 0,00"
           keyboardType="decimal-pad"
           value={limitText}
           onChangeText={setLimitText}
@@ -103,6 +114,9 @@ export function BudgetsScreen() {
 const makeStyles = (t: Theme) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: t.background, padding: 20 },
+    about: { backgroundColor: t.card, borderRadius: 12, padding: 14, marginBottom: 8 },
+    aboutTitle: { fontSize: 15, fontWeight: "600", color: t.text },
+    aboutText: { fontSize: 14, color: t.textSecondary, marginTop: 4, lineHeight: 20 },
     row: { paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: t.separator },
     rowHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
     rowTitle: { fontSize: 15, color: t.text },
