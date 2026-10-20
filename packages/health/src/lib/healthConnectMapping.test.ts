@@ -2,7 +2,6 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   FIRST_IMPORT_DAYS,
-  bodyFatToMeasurement,
   fallbackWindowStart,
   importWindowStart,
   latestHeightMm,
@@ -17,16 +16,9 @@ test("weight is converted from kilograms to whole grams", () => {
   assert.deepEqual(m, { kind: "weight", value: 82457, measuredAt: Date.UTC(2026, 9, 15, 7, 30), externalId: "hc:abc" });
 });
 
-test("body fat is stored in tenths of a percent", () => {
-  const m = bodyFatToMeasurement({ time: "2026-10-15T07:30:00Z", percentage: 23.44, metadata: { id: "x" } });
-  assert.equal(m?.value, 234);
-  assert.equal(m?.kind, "bodyFat");
-});
-
 test("broken records are skipped instead of saved", () => {
   assert.equal(weightToMeasurement({ time: "not a date", weight: { inKilograms: 80 } }), null);
   assert.equal(weightToMeasurement({ time: "2026-10-15T07:30:00Z", weight: { inKilograms: 0 } }), null);
-  assert.equal(bodyFatToMeasurement({ time: "2026-10-15T07:30:00Z", percentage: 140 }), null);
 });
 
 test("a record without an id still gets a stable external id", () => {

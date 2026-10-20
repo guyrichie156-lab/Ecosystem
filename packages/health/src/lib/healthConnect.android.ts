@@ -11,8 +11,8 @@ import {
 } from "react-native-health-connect";
 import type { HealthConnectData, HealthConnectStatus } from "./healthConnectTypes";
 
-type ImportedType = "Weight" | "BodyFat" | "Height";
-const IMPORTED_TYPES: ImportedType[] = ["Weight", "BodyFat", "Height"];
+type ImportedType = "Weight" | "Height";
+const IMPORTED_TYPES: ImportedType[] = ["Weight", "Height"];
 const READ_PERMISSIONS: Permission[] = IMPORTED_TYPES.map((recordType) => ({ accessType: "read", recordType }));
 
 // The Health Connect app's id on Google Play (needed on Android 13 and lower).
@@ -69,14 +69,13 @@ async function readAll<T extends ImportedType>(recordType: T, startTime: number,
 
 /** Reads only the types the user allowed; reading a type without permission throws. */
 export async function readHealthConnectData(startTime: number, endTime: number): Promise<HealthConnectData> {
-  if (!(await ensureInitialized())) return { weights: [], bodyFats: [], heights: [] };
+  if (!(await ensureInitialized())) return { weights: [], heights: [] };
   const types = await grantedTypes();
-  const [weights, bodyFats, heights] = await Promise.all([
+  const [weights, heights] = await Promise.all([
     types.has("Weight") ? readAll("Weight", startTime, endTime) : [],
-    types.has("BodyFat") ? readAll("BodyFat", startTime, endTime) : [],
     types.has("Height") ? readAll("Height", startTime, endTime) : [],
   ]);
-  return { weights, bodyFats, heights };
+  return { weights, heights };
 }
 
 export function openHealthConnectInStore(): void {

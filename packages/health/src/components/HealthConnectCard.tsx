@@ -59,7 +59,7 @@ export function HealthConnectCard({ onImported }: { onImported: () => void }) {
       action = { label: "Открыть Google Play", onPress: openHealthConnectInStore };
       break;
     case "no_permission":
-      text = "Health Connect собирает данные с разных приложений и устройств. Можно подтягивать оттуда вес, процент жира и рост.";
+      text = "Health Connect собирает данные с разных приложений и устройств. Можно подтягивать оттуда вес и рост.";
       action = { label: "Подключить", onPress: connect };
       break;
     default:

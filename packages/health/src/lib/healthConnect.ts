@@ -11,7 +11,7 @@ export async function requestHealthConnectAccess(): Promise<boolean> {
 }
 
 export async function readHealthConnectData(_startTime: number, _endTime: number): Promise<HealthConnectData> {
-  return { weights: [], bodyFats: [], heights: [] };
+  return { weights: [], heights: [] };
 }
 
 export function openHealthConnectInStore(): void {}

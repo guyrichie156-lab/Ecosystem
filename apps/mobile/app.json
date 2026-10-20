@@ -22,7 +22,6 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.health.READ_WEIGHT",
-        "android.permission.health.READ_BODY_FAT",
         "android.permission.health.READ_HEIGHT"
       ]
     },

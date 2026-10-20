@@ -1,7 +1,6 @@
 import { db, bodyMeasurements, getProfile, saveProfile, settingsStorage } from "@ecosystem/db";
 import { readHealthConnectData } from "./healthConnect";
 import {
-  bodyFatToMeasurement,
   fallbackWindowStart,
   importWindowStart,
   latestHeightMm,
@@ -31,7 +30,7 @@ export function getLastHealthConnectImport(): number | null {
 export type HealthConnectImportResult = { added: number; importedAt: number };
 
 /**
- * Reads weight, body fat and height from Health Connect since the last import and saves what's new.
+ * Reads weight and height from Health Connect since the last import and saves what's new.
  * Records already imported are skipped by their Health Connect id; a height fills the profile only
  * if the user hasn't entered one.
  */
@@ -46,9 +45,7 @@ export async function importFromHealthConnect(now = Date.now()): Promise<HealthC
     data = await readHealthConnectData(fallbackWindowStart(now), now);
   }
 
-  const rows = [...data.weights.map(weightToMeasurement), ...data.bodyFats.map(bodyFatToMeasurement)].filter(
-    (m): m is ImportedMeasurement => m !== null
-  );
+  const rows = data.weights.map(weightToMeasurement).filter((m): m is ImportedMeasurement => m !== null);
   let added = 0;
   for (let i = 0; i < rows.length; i += INSERT_CHUNK) {
     const inserted = await db

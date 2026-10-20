@@ -14,8 +14,6 @@ export const OVERLAP_DAYS = 1;
 
 type InstantRecord = { time: string; metadata?: { id?: string } };
 export type HealthConnectWeight = InstantRecord & { weight: { inKilograms: number } };
-/** `percentage` is 0–100, as in Health Connect's BodyFatRecord. */
-export type HealthConnectBodyFat = InstantRecord & { percentage: number };
 export type HealthConnectHeight = InstantRecord & { height: { inMeters: number } };
 
 export type ImportedMeasurement = {
@@ -36,12 +34,6 @@ function toMeasurement(kind: BodyMeasurementKind, value: number, record: Instant
 /** Kilograms -> grams, the unit the measurements table stores. */
 export function weightToMeasurement(record: HealthConnectWeight): ImportedMeasurement | null {
   return toMeasurement("weight", Math.round(record.weight.inKilograms * 1000), record);
-}
-
-/** Percent -> tenths of a percent. */
-export function bodyFatToMeasurement(record: HealthConnectBodyFat): ImportedMeasurement | null {
-  if (record.percentage > 100) return null;
-  return toMeasurement("bodyFat", Math.round(record.percentage * 10), record);
 }
 
 /** The most recent height in millimetres, or null if there is none or it is implausible. */

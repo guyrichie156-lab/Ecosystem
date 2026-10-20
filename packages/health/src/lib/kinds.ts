@@ -4,10 +4,10 @@ import { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind } from "@ecosystem/db/
 export { BODY_MEASUREMENT_KINDS, type BodyMeasurementKind };
 
 /**
- * Zones the app asks for and shows: the MVP set the user chose on 2026-10-17. Only these take part in
- * calculations (tips, Health Connect import). Rows of the other kinds stay in the database, unseen.
+ * Measurements the app asks for and shows: only weight since 2026-10-20 (the user dropped body fat and
+ * waist). Rows of the other kinds stay in the database, unseen, so they can come back.
  */
-export const ACTIVE_KINDS = ["weight", "bodyFat", "waist"] as const satisfies readonly BodyMeasurementKind[];
+export const ACTIVE_KINDS = ["weight"] as const satisfies readonly BodyMeasurementKind[];
 
 type KindInfo = {
   label: string;
