@@ -78,3 +78,8 @@ allprojects { project ->
 - В готовом APK есть два пути:
   1. Собрать и поставить новый APK. Приложение при этом перезапускается, данные сохраняются.
   2. Позже можно подключить EAS Update: новый JS-код скачивается в уже установленное приложение и применяется при перезапуске. Работает только для изменений в JS-коде; новые нативные библиотеки требуют нового APK: https://docs.expo.dev/eas-update/runtime-versions.md
+
+## Пересборка APK без prebuild (2026-10-20)
+- Gradle-задача `createBundleReleaseJsAndAssets` следит только за файлами приложения, а не за `packages/*`. Поэтому после правки в модуле повторный `./gradlew assembleRelease` может написать `UP-TO-DATE` и положить в APK старый JS. Так было 2026-10-20.
+- Если нужна быстрая пересборка, сначала удалить старый бандл: `rm -rf app/build/generated/assets/react/release app/build/generated/res/react/release app/build/generated/sourcemaps/react/release app/build/intermediates/sourcemaps/react/release`. Иначе — полный путь с `npx expo prebuild --clean`.
+- Проверка готового APK: распаковать `assets/index.android.bundle` и найти новую строку интерфейса. Русские строки Hermes хранит в UTF-16LE, искать их нужно в этой кодировке.
