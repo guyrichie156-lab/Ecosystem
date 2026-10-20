@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Link, useRouter } from "expo-router";
+import { getProfile } from "@ecosystem/db";
 import { PrimaryButton, useAsyncData, useRefreshOnFocus, useThemedStyles, type Theme } from "@ecosystem/core";
 import { ACTIVE_KINDS, KIND_INFO, formatChange, formatMeasurement, type BodyMeasurementKind } from "../lib/kinds";
 import { getLatestMeasurements, getMeasurementSeries, type LatestMeasurement } from "../lib/measurements";
-import { getHealthProfile } from "../lib/profile";
 import { getHealthTips } from "../lib/tips";
 import { TipCarousel } from "../components/TipCarousel";
 import { HealthConnectCard } from "../components/HealthConnectCard";
@@ -41,7 +41,7 @@ export function HealthHomeScreen() {
   const router = useRouter();
   const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(async () => {
     const [latest, weightSeries] = await Promise.all([getLatestMeasurements(), getMeasurementSeries("weight")]);
-    const profile = getHealthProfile();
+    const profile = getProfile();
     return { latest, profile, tips: getHealthTips({ latest, weightSeries, profile }) };
   }, []);
   useRefreshOnFocus(refresh);

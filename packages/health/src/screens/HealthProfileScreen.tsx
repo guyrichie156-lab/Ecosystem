@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Chip, PrimaryButton, TextField, useThemedStyles, type Theme } from "@ecosystem/core";
 import { useRouter } from "expo-router";
-import { getHealthProfile, saveHealthProfile, type Sex } from "../lib/profile";
+import { getProfile, saveProfile, type Sex } from "@ecosystem/db";
 
 const SEX_OPTIONS: { value: Sex | null; label: string }[] = [
   { value: "male", label: "Мужской" },
@@ -14,7 +14,7 @@ export function HealthProfileScreen() {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   // Read once: the stored profile is only the starting value of the form.
-  const [initial] = useState(getHealthProfile);
+  const [initial] = useState(getProfile);
   const [heightText, setHeightText] = useState(initial.heightMm ? String(initial.heightMm / 10) : "");
   const [sex, setSex] = useState<Sex | null>(initial.sex);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export function HealthProfileScreen() {
       }
       heightMm = Math.round(cm * 10);
     }
-    saveHealthProfile({ heightMm, sex });
+    saveProfile({ ...initial, heightMm, sex });
     router.back();
   }
 

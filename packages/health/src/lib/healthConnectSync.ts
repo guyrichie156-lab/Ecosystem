@@ -1,4 +1,4 @@
-import { db, bodyMeasurements } from "@ecosystem/db";
+import { db, bodyMeasurements, getProfile, saveProfile, settingsStorage } from "@ecosystem/db";
 import { readHealthConnectData } from "./healthConnect";
 import {
   bodyFatToMeasurement,
@@ -8,8 +8,6 @@ import {
   weightToMeasurement,
   type ImportedMeasurement,
 } from "./healthConnectMapping";
-import { getHealthProfile, saveHealthProfile } from "./profile";
-import { settingsStorage } from "./settingsStorage";
 
 const LAST_IMPORT_KEY = "health.healthConnect.lastImportAt";
 // Keeps each INSERT well under SQLite's limit on bound values.
@@ -62,8 +60,8 @@ export async function importFromHealthConnect(now = Date.now()): Promise<HealthC
   }
 
   const heightMm = latestHeightMm(data.heights);
-  const profile = getHealthProfile();
-  if (heightMm && !profile.heightMm) saveHealthProfile({ ...profile, heightMm });
+  const profile = getProfile();
+  if (heightMm && !profile.heightMm) saveProfile({ ...profile, heightMm });
 
   settingsStorage.setItemSync(LAST_IMPORT_KEY, String(now));
   importListeners.forEach((listener) => listener());

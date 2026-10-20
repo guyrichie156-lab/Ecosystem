@@ -1,6 +1,5 @@
 export * from "./lib/kinds";
 export * from "./lib/measurements";
-export * from "./lib/profile";
 export * from "./lib/tips";
 export * from "./screens/HealthHomeScreen";
 export * from "./screens/AddMeasurementScreen";

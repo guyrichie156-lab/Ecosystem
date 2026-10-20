@@ -1,5 +1,5 @@
 import type { LatestMeasurement } from "./measurements";
-import type { HealthProfile } from "./profile";
+import type { Profile } from "@ecosystem/db/src/profile";
 
 /**
  * Rule-based tips from the user's own measurements. Every fact a tip states comes from the
@@ -47,7 +47,7 @@ export type TipInput = {
   latest: LatestMeasurement[];
   /** Weight measurements, oldest first. */
   weightSeries: { value: number; measuredAt: number }[];
-  profile: HealthProfile;
+  profile: Pick<Profile, "heightMm" | "sex">;
 };
 
 const DAY = 24 * 60 * 60 * 1000;
