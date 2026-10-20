@@ -84,6 +84,7 @@ export function RecoveryTab() {
         disabled={rested.length === 0}
         style={styles.startButton}
       />
+      {data && rested.length === 0 && <Text style={styles.muted}>Все основные мышцы ещё отдыхают.</Text>}
       {startError && <Text style={styles.error}>{startError}</Text>}
 
       {recovery.map((r) => {
