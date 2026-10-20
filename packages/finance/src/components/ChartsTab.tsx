@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import {
   FLOATING_BUTTON_CLEARANCE,
@@ -15,14 +15,25 @@ import { type Month } from "../lib/period";
 import { CategoryDonut } from "./CategoryDonut";
 import { MonthSwitcher } from "./MonthSwitcher";
 
-type Kind = "expense" | "income";
+/** Which side of the money the chart shows. */
+export type ChartKind = "expense" | "income";
 
 const monthName = new Intl.DateTimeFormat("ru-RU", { month: "long" });
 
 /** «Графики»: the month's expenses or income by category. */
-export function ChartsTab({ month, onMonthChange }: { month: Month; onMonthChange: (month: Month) => void }) {
+export function ChartsTab({
+  month,
+  onMonthChange,
+  kind,
+  onKindChange,
+}: {
+  month: Month;
+  onMonthChange: (month: Month) => void;
+  /** Kept by FinanceScreen, so tapping «Доходы» in «Записи» can open the income chart. */
+  kind: ChartKind;
+  onKindChange: (kind: ChartKind) => void;
+}) {
   const styles = useThemedStyles(makeStyles);
-  const [kind, setKind] = useState<Kind>("expense");
   // As many coloured slices as the palette has colours (the same five in both themes).
   const colours = useTheme().chart.slots.length;
   const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(
@@ -46,7 +57,7 @@ export function ChartsTab({ month, onMonthChange }: { month: Month; onMonthChang
           { value: "income", label: "Доходы" },
         ]}
         value={kind}
-        onChange={setKind}
+        onChange={onKindChange}
       />
       <View style={styles.month}>
         <MonthSwitcher month={month} onChange={onMonthChange} />

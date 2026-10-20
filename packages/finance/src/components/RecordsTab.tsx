@@ -44,8 +44,24 @@ const Row = React.memo(function Row({ item, onPress }: { item: TransactionListIt
   );
 });
 
+export type MonthTotal = "expense" | "income" | "balance";
+
+const TOTALS: { total: MonthTotal; label: string; hint: string }[] = [
+  { total: "expense", label: "Расходы", hint: "Открывает расходы по категориям" },
+  { total: "income", label: "Доходы", hint: "Открывает доходы по категориям" },
+  { total: "balance", label: "Баланс", hint: "Открывает отчёты" },
+];
+
 /** «Записи»: the month's income and expenses with its totals, one section per day, newest first. */
-export function RecordsTab({ month, onMonthChange }: { month: Month; onMonthChange: (month: Month) => void }) {
+export function RecordsTab({
+  month,
+  onMonthChange,
+  onTotalPress,
+}: {
+  month: Month;
+  onMonthChange: (month: Month) => void;
+  onTotalPress: (total: MonthTotal) => void;
+}) {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
   const { data, loading, refreshing, refresh, pullToRefresh } = useAsyncData(() => {
@@ -71,17 +87,19 @@ export function RecordsTab({ month, onMonthChange }: { month: Month; onMonthChan
         <View>
           <MonthSwitcher month={month} onChange={onMonthChange} />
           <View style={styles.totals}>
-            {[
-              ["Расходы", totals.expense],
-              ["Доходы", totals.income],
-              ["Баланс", totals.balance],
-            ].map(([label, value]) => (
-              <View key={label} style={styles.total}>
-                <Text style={styles.totalLabel}>{label}</Text>
+            {TOTALS.map(({ total, label, hint }) => (
+              <Pressable
+                key={total}
+                style={({ pressed }) => [styles.total, pressed && styles.pressed]}
+                onPress={() => onTotalPress(total)}
+                accessibilityRole="button"
+                accessibilityHint={hint}
+              >
+                <Text style={styles.totalLabel}>{label} ›</Text>
                 <Text style={styles.totalValue} numberOfLines={1} adjustsFontSizeToFit>
-                  {formatMinorUnits(value as number)}
+                  {formatMinorUnits(totals[total])}
                 </Text>
-              </View>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -119,7 +137,8 @@ const makeStyles = (t: Theme) =>
     list: { flex: 1 },
     content: { paddingHorizontal: 20, paddingBottom: FLOATING_BUTTON_CLEARANCE },
     totals: { flexDirection: "row", backgroundColor: t.card, borderRadius: 14, paddingVertical: 12, marginTop: 4 },
-    total: { flex: 1, alignItems: "center", paddingHorizontal: 4 },
+    total: { flex: 1, alignItems: "center", paddingHorizontal: 4, borderRadius: 10 },
+    pressed: { opacity: 0.6 },
     totalLabel: { fontSize: 13, color: t.textMuted },
     totalValue: { fontSize: 16, fontWeight: "700", color: t.text, marginTop: 4 },
     dayHeader: {
