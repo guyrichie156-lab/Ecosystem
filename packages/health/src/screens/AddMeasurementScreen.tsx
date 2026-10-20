@@ -42,7 +42,7 @@ export function AddMeasurementScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-      <Text style={styles.hint}>Заполните только то, что измерили. Дробная часть — через запятую.</Text>
+      <Text style={styles.hint}>Дробная часть — через запятую.</Text>
       {ACTIVE_KINDS.map((kind) => (
         <View key={kind} style={styles.field}>
           <Text style={styles.label}>{labelWithUnit(kind)}</Text>

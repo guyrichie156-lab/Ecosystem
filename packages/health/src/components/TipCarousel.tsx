@@ -5,7 +5,7 @@ import type { Tip } from "../lib/tips";
 import { TipCard } from "./TipCard";
 
 /** Tips one card at a time: swipe sideways, or tap a dot. Attention tips come first (getHealthTips orders them). */
-export function TipCarousel({ tips, onAction }: { tips: Tip[]; onAction: (action: "profile") => void }) {
+export function TipCarousel({ tips }: { tips: Tip[] }) {
   const styles = useThemedStyles(makeStyles);
   const [width, setWidth] = useState(0);
   const [index, setIndex] = useState(0);
@@ -36,7 +36,7 @@ export function TipCarousel({ tips, onAction }: { tips: Tip[]; onAction: (action
           onScroll={(e) => setIndex(Math.round(e.nativeEvent.contentOffset.x / width))}
           renderItem={({ item }) => (
             <View style={{ width }}>
-              <TipCard tip={item} onAction={onAction} style={styles.card} />
+              <TipCard tip={item} style={styles.card} />
             </View>
           )}
         />

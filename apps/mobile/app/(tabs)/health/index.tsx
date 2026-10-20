@@ -1,3 +1,3 @@
-import { HealthHomeScreen } from "@ecosystem/health";
+import { HealthScreen } from "@ecosystem/health";
 
-export default HealthHomeScreen;
+export default HealthScreen;

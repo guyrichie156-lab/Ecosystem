@@ -1,9 +1,8 @@
-import type { LatestMeasurement } from "./measurements";
-import type { Profile } from "@ecosystem/db/src/profile";
 
 /**
- * Rule-based tips from the user's own measurements. Every fact a tip states comes from the
- * source it links to; see notes/health-module.md for how each source was checked.
+ * Tips for training and weight: the general ones always, the weight-loss pace once there are
+ * weigh-ins. Every fact a tip states comes from the source it links to; see notes/health-module.md
+ * for how each source was checked.
  * Pure function (no database, no UI) so the rules can be unit-tested.
  */
 
@@ -16,19 +15,9 @@ export type Tip = {
   /** Shown first, with an "Обратите внимание" marker. */
   attention: boolean;
   source?: TipSource;
-  /** The tip asks the user to fill in their profile. */
-  action?: "profile";
 };
 
 export const TIP_SOURCES = {
-  niceWaistToHeight: {
-    label: "NICE, стандарт качества QS212 (2025)",
-    url: "https://www.nice.org.uk/guidance/qs212/chapter/Quality-statement-1-Recording-BMI-and-waist-to-height-ratio-in-adults",
-  },
-  wcrfWaist: {
-    label: "World Cancer Research Fund UK: как измерить талию",
-    url: "https://www.wcrf.org/uk/here-help/health-tools/how-measure-your-waist",
-  },
   nhsWeightLoss: {
     label: "NHS: Overweight and obesity",
     url: "https://www.nhs.uk/conditions/overweight-and-obesity/",
@@ -41,72 +30,20 @@ export const TIP_SOURCES = {
     label: "ВОЗ: рекомендации по физической активности (2020)",
     url: "https://iris.who.int/server/api/core/bitstreams/f3885485-e7eb-4504-8026-edd9bb53a6ee/content",
   },
+  acsmRest: {
+    label: "ACSM, Garber и др., 2011 — по пересказу Medical News Today",
+    url: "https://www.medicalnewstoday.com/releases/229871",
+  },
 } satisfies Record<string, TipSource>;
 
 export type TipInput = {
-  latest: LatestMeasurement[];
   /** Weight measurements, oldest first. */
   weightSeries: { value: number; measuredAt: number }[];
-  profile: Pick<Profile, "heightMm" | "sex">;
 };
 
 const DAY = 24 * 60 * 60 * 1000;
 const decimal = (n: number, digits = 1) =>
   n.toLocaleString("ru-RU", { minimumFractionDigits: digits, maximumFractionDigits: digits });
-
-function waistToHeightTip(waistMm: number, heightMm: number, weightGrams: number | undefined): Tip | null {
-  // NICE uses the ratio only for adults with BMI below 35.
-  if (weightGrams !== undefined) {
-    const heightM = heightMm / 1000;
-    const bmi = weightGrams / 1000 / (heightM * heightM);
-    if (bmi >= 35) return null;
-  }
-  const ratio = waistMm / heightMm;
-  const shown = decimal(ratio, 2);
-  const source = TIP_SOURCES.niceWaistToHeight;
-  if (ratio >= 0.6) {
-    return {
-      id: "whtr",
-      attention: true,
-      title: `Талия к росту: ${shown}`,
-      text: "По шкале NICE 0,6 и выше — дальнейшее повышение рисков для здоровья. Здоровый диапазон — 0,4–0,49.",
-      source,
-    };
-  }
-  if (ratio >= 0.5) {
-    return {
-      id: "whtr",
-      attention: true,
-      title: `Талия к росту: ${shown}`,
-      text: "По шкале NICE 0,5–0,59 — повышенный риск. Здоровый диапазон — 0,4–0,49, то есть талия меньше половины роста.",
-      source,
-    };
-  }
-  if (ratio >= 0.4) {
-    return {
-      id: "whtr",
-      attention: false,
-      title: `Талия к росту: ${shown}`,
-      text: "Это здоровый диапазон по шкале NICE: 0,4–0,49.",
-      source,
-    };
-  }
-  return null;
-}
-
-function waistBySexTip(waistMm: number, sex: "male" | "female"): Tip | null {
-  const limitCm = sex === "male" ? 94 : 80;
-  if (waistMm < limitCm * 10) return null;
-  return {
-    id: "waist-sex",
-    attention: true,
-    title: `Талия ${decimal(waistMm / 10)} см`,
-    text: `World Cancer Research Fund считает здоровой талию меньше ${limitCm} см для ${
-      sex === "male" ? "мужчин" : "женщин"
-    } (для азиатских популяций ориентиры могут быть другими). Укажите рост — тогда приложение посчитает и отношение талии к росту по шкале NICE.`,
-    source: TIP_SOURCES.wcrfWaist,
-  };
-}
 
 /** Weekly weight change over the last 4 weeks, if two weigh-ins at least a week apart exist. */
 export function weeklyWeightChangeKg(series: TipInput["weightSeries"]): number | null {
@@ -141,64 +78,40 @@ function weightRateTip(series: TipInput["weightSeries"]): Tip | null {
   };
 }
 
-const grew = (m: LatestMeasurement | undefined) => !!m && m.previous !== null && m.value > m.previous;
-
-export function getHealthTips({ latest, weightSeries, profile }: TipInput): Tip[] {
-  const byKind = new Map(latest.map((m) => [m.kind, m]));
-  const waist = byKind.get("waist");
-  const tips: Tip[] = [];
-
-  if (waist && profile.heightMm) {
-    const tip = waistToHeightTip(waist.value, profile.heightMm, byKind.get("weight")?.value);
-    if (tip) tips.push(tip);
-  } else if (waist && profile.sex) {
-    const tip = waistBySexTip(waist.value, profile.sex);
-    if (tip) tips.push(tip);
-  }
-
-  const rate = weightRateTip(weightSeries);
-  if (rate) tips.push(rate);
-
-  if (grew(waist)) {
-    tips.push({
-      id: "spot-reduction",
-      attention: false,
-      title: "Живот не уходит от одних упражнений на пресс",
-      text: "В исследовании с 24 участниками 6 недель упражнений на пресс без изменения питания не уменьшили ни жир на животе, ни его обхват — выросла только выносливость мышц пресса.",
-      source: TIP_SOURCES.abdominalExerciseStudy,
-    });
-  }
-
-  // While waist is new to the user (fewer than 3 measurements), remind how to measure.
-  const waistCount = waist?.count ?? 0;
-  if (waistCount > 0 && waistCount < 3) {
-    tips.push({
-      id: "how-to-measure",
-      attention: false,
-      title: "Как мерить талию",
-      text: "Лента — посередине между нижним ребром и верхом тазовой кости, ровно и плотно, но не впиваясь. Замер — после обычного выдоха, не втягивая живот.",
-      source: TIP_SOURCES.wcrfWaist,
-    });
-  }
-
-  if (waist && !profile.heightMm) {
-    tips.push({
-      id: "profile",
-      attention: false,
-      title: "Укажите рост",
-      text: "С ростом приложение посчитает отношение талии к росту — показатель, которым пользуется NICE.",
-      action: "profile",
-    });
-  }
-
-  tips.push({
+const GENERAL_TIPS: Tip[] = [
+  {
+    id: "strength",
+    attention: false,
+    title: "Силовые — 2 дня в неделю или больше",
+    text: "ВОЗ советует взрослым силовые упражнения умеренной или большей интенсивности на все основные группы мышц 2 дня в неделю или больше.",
+    source: TIP_SOURCES.whoActivity,
+  },
+  {
     id: "activity",
     attention: false,
     title: "Сколько двигаться",
-    text: "ВОЗ рекомендует взрослым 150–300 минут умеренной или 75–150 минут интенсивной аэробной активности в неделю, а ещё силовые упражнения на все основные группы мышц — 2 дня в неделю или больше.",
+    text: "ВОЗ рекомендует взрослым 150–300 минут умеренной или 75–150 минут интенсивной аэробной активности в неделю.",
     source: TIP_SOURCES.whoActivity,
-  });
+  },
+  {
+    id: "rest",
+    attention: false,
+    title: "Отдых между тренировками одной мышцы",
+    text: "ACSM советует отдыхать не меньше 48 часов между силовыми тренировками одной группы мышц. По этому правилу считается вкладка «Отдых мышц»; часть исследователей считает, что полные 48 часов нужны не всегда.",
+    source: TIP_SOURCES.acsmRest,
+  },
+  {
+    id: "spot-reduction",
+    attention: false,
+    title: "Живот не уходит от одних упражнений на пресс",
+    text: "В исследовании с 24 участниками 6 недель упражнений на пресс без изменения питания не уменьшили ни жир на животе, ни его обхват — выросла только выносливость мышц пресса.",
+    source: TIP_SOURCES.abdominalExerciseStudy,
+  },
+];
 
+export function getHealthTips({ weightSeries }: TipInput): Tip[] {
+  const rate = weightRateTip(weightSeries);
+  const tips = rate ? [rate, ...GENERAL_TIPS] : GENERAL_TIPS;
   // Attention first; otherwise keep the order above.
   return [...tips.filter((t) => t.attention), ...tips.filter((t) => !t.attention)];
 }
