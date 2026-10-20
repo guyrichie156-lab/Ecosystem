@@ -86,6 +86,68 @@ export const bodyMeasurements = sqliteTable(
   ]
 );
 
+// Workouts. Exercises are not a table: they are the app's catalog (packages/health/src/lib/exercises.ts),
+// referred to by its text id.
+
+/** A saved workout («комплекс»): a named list of exercises. */
+export const workoutTemplates = sqliteTable("workout_templates", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  createdAt: integer("created_at")
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+});
+
+export const workoutTemplateExercises = sqliteTable(
+  "workout_template_exercises",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    templateId: integer("template_id")
+      .notNull()
+      .references(() => workoutTemplates.id),
+    exerciseId: text("exercise_id").notNull(),
+    position: integer("position").notNull(),
+    sets: integer("sets").notNull(),
+    // Repetitions, or seconds for a held exercise such as the plank.
+    reps: integer("reps").notNull(),
+  },
+  (t) => [index("workout_template_exercises_template").on(t.templateId, t.position)]
+);
+
+/** One workout as done (or being done): finished_at stays null until the user finishes it. */
+export const workoutSessions = sqliteTable(
+  "workout_sessions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    // Null for a workout that wasn't started from a template, or whose template was deleted.
+    templateId: integer("template_id").references(() => workoutTemplates.id),
+    name: text("name").notNull(),
+    startedAt: integer("started_at").notNull(),
+    finishedAt: integer("finished_at"),
+  },
+  (t) => [index("workout_sessions_finished_at").on(t.finishedAt)]
+);
+
+export const workoutSets = sqliteTable(
+  "workout_sets",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    sessionId: integer("session_id")
+      .notNull()
+      .references(() => workoutSessions.id),
+    exerciseId: text("exercise_id").notNull(),
+    position: integer("position").notNull(),
+    // Grams, like body weight; null when the exercise uses body weight only.
+    weightGrams: integer("weight_grams"),
+    reps: integer("reps"),
+    done: integer("done", { mode: "boolean" }).notNull().default(false),
+  },
+  (t) => [
+    index("workout_sets_session").on(t.sessionId, t.position),
+    index("workout_sets_exercise").on(t.exerciseId),
+  ]
+);
+
 export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions, { relationName: "accountTransactions" }),
 }));

@@ -43,6 +43,13 @@
       "when": 1792343926116,
       "tag": "0005_category_icons",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792502071422,
+      "tag": "0006_overrated_jubilee",
+      "breakpoints": true
     }
   ]
 }
