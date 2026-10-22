@@ -5,7 +5,16 @@
 
 Установить с компьютера (телефон подключён кабелем): `adb install -r <файл>.apk`.
 
-## ecosystem-2026-10-20.apk — новый
+## ecosystem-2026-10-22.apk — новый
+Скачать: https://github.com/guyrichie156-lab/Ecosystem/raw/apk/ecosystem-2026-10-22.apk
+
+- Собран 2026-10-22 из ветки `feature/brand` (c133b52). В ней всё из сборки 2026-10-20 (`feature/food`).
+- Что нового: приложение называется «Хата», новая иконка — красный дом с белым ромбом-окном и зелёным ромбом внутри. Функции те же, что в сборке 2026-10-20.
+- Разрешения те же, что в сборке 2026-10-20.
+- Android 8.0 и новее, процессоры ARM (`arm64-v8a`, `armeabi-v7a`).
+- 77 243 614 байт, SHA-256 `534a2feb1467483a817878611c423455726a18f14512a89f130e648161ed9f6b`.
+
+## ecosystem-2026-10-20.apk — четвёртый
 Скачать: https://github.com/guyrichie156-lab/Ecosystem/raw/apk/ecosystem-2026-10-20.apk
 
 - Собран 2026-10-20 из ветки `feature/food` (e33aec4). В ней лежат `feature/health-fitness` и `feature/finance-ux`, а под ними — всё из третьей сборки и чистка кода `feature/code-cleanup`.
