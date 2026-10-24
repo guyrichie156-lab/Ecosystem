@@ -1,5 +1,5 @@
 import { Stack, type ErrorBoundaryProps } from "expo-router";
-import { ModuleErrorFallback } from "@ecosystem/core";
+import { ModuleErrorFallback, SettingsButton } from "@ecosystem/core";
 import { foodModule } from "@ecosystem/food";
 
 export function ErrorBoundary(props: ErrorBoundaryProps) {
@@ -9,7 +9,7 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
 export default function FoodLayout() {
   return (
     <Stack screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="index" options={{ title: "Еда" }} />
+      <Stack.Screen name="index" options={{ title: "Еда", headerRight: () => <SettingsButton /> }} />
       <Stack.Screen name="add" options={{ title: "Добавить еду" }} />
       <Stack.Screen name="portion/[id]" options={{ title: "Порция" }} />
       <Stack.Screen name="entry/[id]" options={{ title: "Запись" }} />

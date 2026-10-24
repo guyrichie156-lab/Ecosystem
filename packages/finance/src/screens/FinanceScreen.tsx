@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Link, Stack } from "expo-router";
-import { FloatingAddButton, SegmentedControl, useThemedStyles, useToday, type Theme } from "@ecosystem/core";
+import { FloatingAddButton, SegmentedControl, SettingsButton, useThemedStyles, useToday, type Theme } from "@ecosystem/core";
 import { compareMonths, monthOf, type Month } from "../lib/period";
 import { ChartsTab, type ChartKind } from "../components/ChartsTab";
 import { RecordsTab, type MonthTotal } from "../components/RecordsTab";
@@ -38,11 +38,14 @@ export function FinanceScreen() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Link href="/finance/budgets" asChild>
-              <Pressable hitSlop={10} accessibilityRole="link" style={styles.headerButton}>
-                <Text style={styles.headerLink}>Бюджеты</Text>
-              </Pressable>
-            </Link>
+            <View style={styles.headerButtons}>
+              <Link href="/finance/budgets" asChild>
+                <Pressable hitSlop={10} accessibilityRole="link" style={styles.headerButton}>
+                  <Text style={styles.headerLink}>Бюджеты</Text>
+                </Pressable>
+              </Link>
+              <SettingsButton />
+            </View>
           ),
         }}
       />
@@ -74,6 +77,7 @@ const makeStyles = (t: Theme) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: t.background },
     tabs: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
-    headerButton: { paddingHorizontal: 16 },
+    headerButtons: { flexDirection: "row", alignItems: "center" },
+    headerButton: { paddingHorizontal: 12 },
     headerLink: { fontSize: 16, color: t.link },
   });

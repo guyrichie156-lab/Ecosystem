@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Link, Stack } from "expo-router";
-import { SegmentedControl, useThemedStyles, type Theme } from "@ecosystem/core";
+import { SegmentedControl, SettingsButton, useThemedStyles, type Theme } from "@ecosystem/core";
 import { ExercisesTab } from "../components/ExercisesTab";
 import { RecoveryTab } from "../components/RecoveryTab";
 import { TrainingTab } from "../components/TrainingTab";
@@ -21,11 +21,14 @@ export function HealthScreen() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Link href="/health/profile" asChild>
-              <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel="Профиль" style={styles.headerButton}>
-                <Text style={styles.headerIcon}>👤</Text>
-              </Pressable>
-            </Link>
+            <View style={styles.headerButtons}>
+              <Link href="/health/profile" asChild>
+                <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel="Профиль" style={styles.headerButton}>
+                  <Text style={styles.headerIcon}>👤</Text>
+                </Pressable>
+              </Link>
+              <SettingsButton />
+            </View>
           ),
         }}
       />
@@ -53,6 +56,7 @@ const makeStyles = (t: Theme) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: t.background },
     tabs: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
-    headerButton: { paddingHorizontal: 16 },
+    headerButtons: { flexDirection: "row", alignItems: "center" },
+    headerButton: { paddingHorizontal: 12 },
     headerIcon: { fontSize: 22 },
   });

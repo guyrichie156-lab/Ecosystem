@@ -22,3 +22,10 @@ Thumbs.db
 
 # Obsidian vault settings (notes/)
 notes/.obsidian/
+
+# Signing keys and data backups never go into the repository
+*.p12
+*.jks
+*.keystore
+keystore.properties
+*.hata
