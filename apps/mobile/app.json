@@ -2,7 +2,7 @@
   "expo": {
     "name": "Хата",
     "slug": "mobile",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "scheme": "hata",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
