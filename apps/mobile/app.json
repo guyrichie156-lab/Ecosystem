@@ -3,16 +3,16 @@
     "name": "Хата",
     "slug": "mobile",
     "version": "1.0.0",
-    "scheme": "ecosystem",
+    "scheme": "hata",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ecosystem.mobile"
+      "bundleIdentifier": "by.hata.app"
     },
     "android": {
-      "package": "com.ecosystem.mobile",
+      "package": "by.hata.app",
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/android-icon-foreground.png",
