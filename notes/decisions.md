@@ -28,6 +28,13 @@
 
 **Приватный репозиторий (просьба пользователя 2026-10-24).** Пользователь попросил сделать репозиторий приватным: «а то боты уже могут что-то украсть». У Claude нет инструмента, который меняет видимость, поэтому меняет сам пользователь: Settings → Danger Zone → Change visibility ([документация GitHub](https://raw.githubusercontent.com/github/docs/main/content/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility.md)). На 2026-10-24 форков 0, звёзд 0 (GitHub API). Что уже было публичным, скопировать могли — это не отменить.
 
+**iPhone (вопрос пользователя 2026-10-24).**
+- JS-сборка для iOS собирается без ошибок: `expo export --platform ios`, 3,6 МБ, ветка `feature/review-fixes`. На настоящем iPhone приложение не запускалось ни разу.
+- На iPhone не будет: Health Connect (там HealthKit, его код не написан) и виджета (сделан только для Android).
+- Установить как приложение можно двумя путями. Бесплатный аккаунт Apple: нужен Mac с Xcode, приложение работает 7 дней, потом его надо переустанавливать, не больше 3 устройств ([Apple: compare memberships](https://developer.apple.com/support/compare-memberships/)). Apple Developer Program: 99 USD в год, без Mac — через облачную сборку EAS, установка на зарегистрированные iPhone (ad hoc) ([Apple: enroll](https://developer.apple.com/programs/enroll/), [Expo: internal distribution](https://raw.githubusercontent.com/expo/expo/main/docs/pages/build/internal-distribution.mdx)).
+- Посмотреть без Mac и без оплаты — Expo Go, пока на компьютере запущен `npx expo start`; нужен вход в аккаунт Expo (см. запись 2026-10-14 (iPhone)). Работает ли в Expo Go всё наше приложение — не проверено.
+- Можно ли из Беларуси оплатить Apple Developer Program — Я не могу это подтвердить.
+
 **Что ждёт решения пользователя.**
 - Архитектура: для кого «Хата» (свои до 100 человек или все); протокол «Мовы» (Matrix — мнение архитектора); вход по e-mail или телефону; где сервер и кто платит; деньги в приложении через партнёра (нужны ИП или юрлицо) или без них.
 - Безопасность: имя пакета — оставить `com.ecosystem.mobile` или новое под «Хату» (решить до перехода на свой ключ); сохранять ли данные в копию Google.
