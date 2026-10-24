@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { PrimaryButton, describeError, useThemedStyles, type Theme } from "@ecosystem/core";
 import { findFoodByBarcode, saveFood } from "../lib/foods";
-import { isBarcode, lookUpBarcode } from "../lib/openFoodFacts";
+import { OffHttpError, isBarcode, lookUpBarcode } from "../lib/openFoodFacts";
 
 /**
  * Scans a product barcode: a food scanned before is found on the phone; otherwise Open Food Facts is
@@ -15,6 +15,7 @@ export function ScanScreen({ query }: { query: string }) {
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
   const [status, setStatus] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   // The camera reports the same code many times a second; only the first one is handled.
   const handling = useRef(false);
 
@@ -50,10 +51,24 @@ export function ScanScreen({ query }: { query: string }) {
         .join("&");
       router.replace(`/food/custom?${query}&${extra}`);
     } catch (e) {
+      // Scanning stays paused until «Сканировать снова»: the camera reports the code many times
+      // a second, and each would send another request.
       console.warn("Barcode lookup failed:", describeError(e));
-      setStatus("Нет связи с Open Food Facts. Проверьте интернет или внесите продукт с этикетки.");
-      handling.current = false;
+      setFailed(true);
+      if (e instanceof OffHttpError && e.status === 429) {
+        setStatus("Open Food Facts просит подождать: можно не больше 15 продуктов в минуту. Подождите минуту или внесите продукт с этикетки.");
+      } else if (e instanceof OffHttpError) {
+        setStatus(`Open Food Facts не ответил (ошибка ${e.status}). Попробуйте позже или внесите продукт с этикетки.`);
+      } else {
+        setStatus("Нет связи с Open Food Facts. Проверьте интернет или внесите продукт с этикетки.");
+      }
     }
+  }
+
+  function scanAgain() {
+    setFailed(false);
+    setStatus(null);
+    handling.current = false;
   }
 
   if (Platform.OS === "web") {
@@ -83,6 +98,7 @@ export function ScanScreen({ query }: { query: string }) {
       />
       <View style={styles.panel}>
         <Text style={styles.text}>{status ?? "Наведите камеру на штрих-код упаковки."}</Text>
+        {failed && <PrimaryButton label="Сканировать снова" onPress={scanAgain} />}
         <Pressable onPress={() => router.replace(`/food/custom?${query}`)} hitSlop={8} accessibilityRole="button">
           <Text style={styles.link}>Внести с этикетки вручную</Text>
         </Pressable>

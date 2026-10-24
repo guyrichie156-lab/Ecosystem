@@ -102,10 +102,15 @@ async function lastWeights(exerciseIds: string[]): Promise<Map<string, number | 
 /**
  * Starts a workout with every set of every exercise laid out; returns the workout's id.
  * A workout left open is finished first (or dropped if nothing in it was done), so one runs at a time.
+ * It may have been left days ago, so it ends when it began: sets don't keep the time they were done,
+ * and «now» would make «Отдых мышц» count muscles trained back then as trained today.
  */
 export async function startWorkout(input: { name: string; templateId?: number; exercises: TemplateExercise[] }): Promise<number> {
-  const open = await db.select({ id: workoutSessions.id }).from(workoutSessions).where(isNull(workoutSessions.finishedAt));
-  for (const workout of open) await finishWorkout(workout.id);
+  const open = await db
+    .select({ id: workoutSessions.id, startedAt: workoutSessions.startedAt })
+    .from(workoutSessions)
+    .where(isNull(workoutSessions.finishedAt));
+  for (const workout of open) await finishWorkout(workout.id, workout.startedAt);
   const [session] = await db
     .insert(workoutSessions)
     .values({ name: input.name, templateId: input.templateId ?? null, startedAt: Date.now() })
@@ -171,8 +176,8 @@ export async function deleteSet(id: number): Promise<void> {
   await db.delete(workoutSets).where(eq(workoutSets.id, id));
 }
 
-/** Finishes a workout; one with no done set is discarded instead. Returns whether it was kept. */
-export async function finishWorkout(id: number): Promise<boolean> {
+/** Finishes a workout at `finishedAt`; one with no done set is discarded instead. Returns whether it was kept. */
+export async function finishWorkout(id: number, finishedAt = Date.now()): Promise<boolean> {
   const [{ done }] = await db
     .select({ done: sql<number>`count(*)` })
     .from(workoutSets)
@@ -182,7 +187,7 @@ export async function finishWorkout(id: number): Promise<boolean> {
     return false;
   }
   await db.delete(workoutSets).where(and(eq(workoutSets.sessionId, id), eq(workoutSets.done, false)));
-  await db.update(workoutSessions).set({ finishedAt: Date.now() }).where(eq(workoutSessions.id, id));
+  await db.update(workoutSessions).set({ finishedAt }).where(eq(workoutSessions.id, id));
   return true;
 }
 

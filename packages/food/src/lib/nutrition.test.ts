@@ -69,11 +69,16 @@ test("an Open Food Facts answer is read per 100 g; kJ is turned into kcal", () =
   });
 });
 
-test("a product without some values is found but incomplete; status 0 is not found", () => {
+test("a product without some values, or with impossible ones, is found but incomplete; status 0 is not found", () => {
   const partial = parseOffProduct({ status: 1, product: { product_name: "Сок", nutriments: { "energy-kcal_100g": 45 } } });
   assert.equal(partial.found, true);
   assert.equal(partial.found && partial.complete, false);
   assert.equal(partial.found && partial.per100g.kcal, 45);
+  const implausible = parseOffProduct({
+    status: 1,
+    product: { product_name: "Масло", nutriments: { "energy-kcal_100g": 3700, proteins_100g: 0, fat_100g: 99, carbohydrates_100g: 0 } },
+  });
+  assert.equal(implausible.found && implausible.complete, false, "over 900 kcal per 100 g is checked against the label");
   assert.deepEqual(parseOffProduct({ status: 0, status_verbose: "product not found" }), { found: false });
   assert.deepEqual(parseOffProduct(null), { found: false });
 });

@@ -57,7 +57,9 @@ function TemplateCard({ template, onStart }: { template: WorkoutTemplate; onStar
       <View style={styles.cardRow}>
         <MiniFigures template={template} scale={0.22} />
         <View style={styles.cardText}>
-          <Text style={styles.cardTitle}>{template.name}</Text>
+          <Text style={styles.cardTitle} numberOfLines={2}>
+            {template.name}
+          </Text>
           <Text style={styles.muted}>{primary.map((m) => MUSCLES[m].label).join(", ") || "Нет упражнений"}</Text>
           <Text style={styles.muted}>
             Упражнений: {template.exercises.length}
@@ -137,7 +139,9 @@ export function TrainingTab() {
               <View style={styles.cardRow}>
                 <MiniFigures template={next} scale={0.3} />
                 <View style={styles.cardText}>
-                  <Text style={styles.nextTitle}>{next.name}</Text>
+                  <Text style={styles.nextTitle} numberOfLines={2}>
+                    {next.name}
+                  </Text>
                   {next.exercises.map((e, i) => (
                     <View key={`${e.exerciseId}-${i}`} style={styles.nextLine}>
                       <Text style={styles.nextName} numberOfLines={1}>

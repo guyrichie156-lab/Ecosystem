@@ -95,7 +95,7 @@ function Fields({ template }: { template: WorkoutTemplate | null }) {
       />
       {error && <Text style={styles.error}>{error}</Text>}
       <Text style={styles.label}>Название</Text>
-      <TextField value={name} onChangeText={setName} placeholder="Например, «Грудь и спина»" accessibilityLabel="Название" />
+      <TextField value={name} onChangeText={setName} maxLength={60} placeholder="Например, «Грудь и спина»" accessibilityLabel="Название" />
 
       <Text style={styles.label}>Упражнения · подходы × повторы</Text>
       {rows.length === 0 && <Text style={styles.muted}>Пока пусто — выберите упражнения ниже.</Text>}
@@ -112,7 +112,7 @@ function Fields({ template }: { template: WorkoutTemplate | null }) {
                 value={row.setsText}
                 onChangeText={(setsText) => update(index, { setsText })}
                 keyboardType="number-pad"
-                accessibilityLabel="Подходов"
+                accessibilityLabel={`Подходов: ${exercise?.name ?? row.exerciseId}`}
               />
               <Text style={styles.muted}>×</Text>
               <TextField
@@ -120,13 +120,13 @@ function Fields({ template }: { template: WorkoutTemplate | null }) {
                 value={row.repsText}
                 onChangeText={(repsText) => update(index, { repsText })}
                 keyboardType="number-pad"
-                accessibilityLabel={exercise?.unit === "seconds" ? "Секунд" : "Повторов"}
+                accessibilityLabel={`${exercise?.unit === "seconds" ? "Секунд" : "Повторов"}: ${exercise?.name ?? row.exerciseId}`}
               />
               {exercise?.unit === "seconds" && <Text style={styles.muted}>сек</Text>}
-              <Pressable onPress={() => moveUp(index)} hitSlop={8} accessibilityRole="button" accessibilityLabel="Выше">
+              <Pressable onPress={() => moveUp(index)} hitSlop={8} accessibilityRole="button" accessibilityLabel={`Выше: ${exercise?.name ?? row.exerciseId}`}>
                 <Text style={styles.icon}>↑</Text>
               </Pressable>
-              <Pressable onPress={() => remove(index)} hitSlop={8} accessibilityRole="button" accessibilityLabel="Убрать">
+              <Pressable onPress={() => remove(index)} hitSlop={8} accessibilityRole="button" accessibilityLabel={`Убрать: ${exercise?.name ?? row.exerciseId}`}>
                 <Text style={styles.icon}>✕</Text>
               </Pressable>
             </View>

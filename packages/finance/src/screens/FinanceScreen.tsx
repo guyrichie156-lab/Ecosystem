@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Link, Stack } from "expo-router";
-import { FloatingAddButton, SegmentedControl, useThemedStyles, type Theme } from "@ecosystem/core";
-import { monthOf, type Month } from "../lib/period";
+import { FloatingAddButton, SegmentedControl, useThemedStyles, useToday, type Theme } from "@ecosystem/core";
+import { compareMonths, monthOf, type Month } from "../lib/period";
 import { ChartsTab, type ChartKind } from "../components/ChartsTab";
 import { RecordsTab, type MonthTotal } from "../components/RecordsTab";
 import { ReportsTab } from "../components/ReportsTab";
@@ -16,7 +16,11 @@ type Tab = "records" | "charts" | "reports";
 export function FinanceScreen() {
   const styles = useThemedStyles(makeStyles);
   const [tab, setTab] = useState<Tab>("records");
-  const [month, setMonth] = useState<Month>(() => monthOf(new Date()));
+  const thisMonth = monthOf(useToday());
+  // The month picked with the arrows; null is the current month, which moves on when a new one starts.
+  const [pickedMonth, setPickedMonth] = useState<Month | null>(null);
+  const month = pickedMonth ?? thisMonth;
+  const setMonth = (next: Month) => setPickedMonth(compareMonths(next, thisMonth) === 0 ? null : next);
   const [chartKind, setChartKind] = useState<ChartKind>("expense");
 
   // A month total in «Записи» opens what it is made of: expenses or income by category, or the balance report.

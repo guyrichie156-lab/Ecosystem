@@ -2,6 +2,7 @@ export * from "./types";
 export * from "./theme";
 export * from "./ModuleErrorFallback";
 export * from "./useAsyncData";
+export * from "./useToday";
 export * from "./TextField";
 export * from "./SegmentedControl";
 export * from "./ticks";

@@ -46,7 +46,7 @@ export function ProfileScreen() {
   // Read once: the stored profile is only the starting value of the form.
   const [initial] = useState(getProfile);
   const [thisYear] = useState(() => new Date().getFullYear());
-  const [heightText, setHeightText] = useState(initial.heightMm ? String(initial.heightMm / 10) : "");
+  const [heightText, setHeightText] = useState(initial.heightMm ? String(initial.heightMm / 10).replace(".", ",") : "");
   const [sex, setSex] = useState<Sex | null>(initial.sex);
   const [birthYearText, setBirthYearText] = useState(initial.birthYear ? String(initial.birthYear) : "");
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);

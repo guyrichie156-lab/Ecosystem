@@ -52,7 +52,12 @@ function PortionForm({
       setConfirmDelete(true);
       return;
     }
-    await onDelete?.();
+    try {
+      await onDelete?.();
+    } catch (e) {
+      console.warn("Deleting a food entry failed:", describeError(e));
+      setError("Не удалось удалить запись. Попробуйте ещё раз.");
+    }
   }
 
   return (

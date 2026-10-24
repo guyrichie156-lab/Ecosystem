@@ -17,18 +17,21 @@ function Form({ initialWeightGrams }: { initialWeightGrams: number | null }) {
   const [initial] = useState(getProfile);
   const [thisYear] = useState(() => new Date().getFullYear());
   const [weightText, setWeightText] = useState(initialWeightGrams ? number.format(initialWeightGrams / 1000) : "");
-  const [heightText, setHeightText] = useState(initial.heightMm ? String(initial.heightMm / 10) : "");
+  // The weight field as last loaded or saved. The field rounds to 10 g (a weight from Health Connect
+  // may have single grams), so a new weigh-in is saved only when the text itself was changed.
+  const [savedWeightText, setSavedWeightText] = useState(weightText);
+  const [heightText, setHeightText] = useState(initial.heightMm ? String(initial.heightMm / 10).replace(".", ",") : "");
   const [sex, setSex] = useState<Sex | null>(initial.sex);
   const [birthYearText, setBirthYearText] = useState(initial.birthYear ? String(initial.birthYear) : "");
   const [level, setLevel] = useState<ActivityLevel>(getActivityLevel);
   const [manualText, setManualText] = useState(() => String(getManualGoal() ?? ""));
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
-  // The weight last stored; a new weigh-in is saved only when the field differs from it.
-  const [storedWeight, setStoredWeight] = useState(initialWeightGrams);
 
   const weightGrams = parseAmount(weightText, 400, 1000);
   const heightMm = parseAmount(heightText, 250, 10);
-  const birthYear = parseAmount(birthYearText, thisYear - 10);
+  const yearText = birthYearText.trim();
+  // Four digits only: parseAmount alone would round «1990,6» to a year.
+  const birthYear = yearText === "" ? null : /^\d{4}$/.test(yearText) ? parseAmount(yearText, thisYear - 10) : undefined;
   const age = typeof birthYear === "number" && birthYear >= thisYear - 100 ? thisYear - birthYear : null;
   const ready = typeof weightGrams === "number" && weightGrams >= 20000 && typeof heightMm === "number" && heightMm >= 1000 && sex && age;
   const inputs = ready ? { weightKg: weightGrams / 1000, heightCm: heightMm / 10, age, sex } : null;
@@ -60,9 +63,9 @@ function Form({ initialWeightGrams }: { initialWeightGrams: number | null }) {
         sex,
         birthYear: age === null ? null : (birthYear as number),
       });
-      if (typeof weightGrams === "number" && weightGrams !== storedWeight) {
+      if (typeof weightGrams === "number" && weightText.trim() !== savedWeightText.trim()) {
         await saveWeighIn(weightGrams);
-        setStoredWeight(weightGrams);
+        setSavedWeightText(weightText);
       }
       saveActivityLevel(level);
       saveManualGoal(manual);

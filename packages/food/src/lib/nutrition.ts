@@ -112,6 +112,9 @@ export type OffLookup =
       complete: boolean;
     };
 
+/** The most per 100 g the label form accepts (CustomFoodScreen): 900 kcal, 100 g of each nutrient. */
+const PER_100G_MAX: Nutrients = { kcal: 900, protein: 1000, fat: 1000, carbs: 1000 };
+
 /** kJ -> kcal: 1 kcal = 4.184 kJ (the thermochemical calorie). */
 const KJ_PER_KCAL = 4.184;
 
@@ -142,6 +145,12 @@ export function parseOffProduct(answer: unknown): OffLookup {
   };
   const name = [product.product_name_ru, product.product_name].find((v): v is string => typeof v === "string" && v.trim() !== "");
   const brand = typeof product.brands === "string" && product.brands.trim() ? product.brands.split(",")[0].trim() : null;
-  const complete = Object.values(per100g).every((v) => v !== undefined) && Object.keys(per100g).length === 4 && !!name;
+  // A value past the label form's limits is likely a mistake in the database (kJ typed as kcal, say):
+  // such a product is not complete, so it opens in the form to be checked against the label.
+  const complete =
+    (Object.keys(PER_100G_MAX) as (keyof Nutrients)[]).every((key) => {
+      const value = per100g[key];
+      return value !== undefined && value <= PER_100G_MAX[key];
+    }) && !!name;
   return { found: true, name: name?.trim() ?? "", brand, per100g, complete };
 }

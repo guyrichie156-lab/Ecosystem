@@ -7,10 +7,11 @@ import {
   useAsyncData,
   useRefreshOnFocus,
   useThemedStyles,
+  useToday,
   type Theme,
 } from "@ecosystem/core";
 import { DaySwitcher } from "../components/DaySwitcher";
-import { addDays, dayKey } from "../lib/days";
+import { addDays, dayKey, dayStart } from "../lib/days";
 import { getEntriesBetween } from "../lib/foods";
 import { getNorm } from "../lib/norm";
 import { MEALS, formatKcal, formatTenths, sumNutrients } from "../lib/nutrition";
@@ -19,9 +20,12 @@ import { MEALS, formatKcal, formatTenths, sumNutrients } from "../lib/nutrition"
 export function FoodDayScreen() {
   const styles = useThemedStyles(makeStyles);
   const router = useRouter();
-  const [today] = useState(() => new Date());
-  const [day, setDay] = useState(() => new Date(today.getFullYear(), today.getMonth(), today.getDate()));
+  const today = useToday();
+  // The day picked with the arrows; null is «today», which moves on at midnight.
+  const [pickedKey, setPickedKey] = useState<string | null>(null);
+  const day = pickedKey === null ? today : dayStart(pickedKey);
   const key = dayKey(day);
+  const changeDay = (next: Date) => setPickedKey(dayKey(next) === dayKey(today) ? null : dayKey(next));
   const { data, refresh } = useAsyncData(async () => {
     const [entries, norm] = await Promise.all([getEntriesBetween(day.getTime(), addDays(day, 1).getTime()), getNorm()]);
     return { entries, norm };
@@ -36,7 +40,7 @@ export function FoodDayScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <DaySwitcher day={day} today={today} onChange={setDay} />
+        <DaySwitcher day={day} today={today} onChange={changeDay} />
         <Link href="/food/norm" asChild>
           <Pressable style={styles.summary} accessibilityRole="button" accessibilityHint="Открывает норму калорий">
             <Text style={styles.muted}>Съедено</Text>
